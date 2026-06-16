@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#FAFBF7" />
+  <title>IELTS Knowledge Reader</title>
+  <link rel="stylesheet" href="style.css?v=20260615-stable-v1" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button id="readerBackButton" class="back-button is-hidden" type="button" data-action="go-back" aria-label="返回上一页">返回</button>
+      <div class="topbar-copy">
+        <p class="topbar-eyebrow">IELTS Knowledge Reader</p>
+        <h1 id="pageTitle" class="topbar-title">今日推荐</h1>
+      </div>
+      <div id="topbarMeta" class="topbar-meta">原创模拟文章</div>
+    </header>
+
+    <main class="main-content">
+      <section id="todayView" class="screen is-active" aria-labelledby="todaySectionTitle">
+        <div class="section-heading">
+          <p class="section-kicker">今日文章</p>
+          <h2 id="todaySectionTitle">今天读什么</h2>
+        </div>
+        <article id="todayArticleCard" class="hero-card"></article>
+      </section>
+
+      <section id="libraryView" class="screen" aria-labelledby="librarySectionTitle">
+        <div class="section-heading">
+          <p class="section-kicker">文章库</p>
+          <h2 id="librarySectionTitle">原创 IELTS-style 文章</h2>
+        </div>
+        <div id="tagFilterBar" class="tag-filter-bar" aria-label="文章标签筛选"></div>
+        <div id="libraryList" class="card-list"></div>
+      </section>
+
+      <section id="vocabView" class="screen" aria-labelledby="vocabSectionTitle">
+        <div class="section-heading">
+          <p class="section-kicker">生词本</p>
+          <h2 id="vocabSectionTitle">已收藏单词</h2>
+        </div>
+        <div id="vocabStats" class="stats-strip"></div>
+        <div id="vocabList" class="vocab-list"></div>
+      </section>
+
+      <section id="readerView" class="screen reader-screen" aria-labelledby="readerArticleTitle">
+        <article class="reader-card">
+          <div class="reader-meta">
+            <p class="reader-kicker">阅读页</p>
+            <h2 id="readerArticleTitle" class="reader-title"></h2>
+            <p id="readerSubtitle" class="reader-subtitle"></p>
+            <div id="readerMetaChips" class="meta-chips"></div>
+          </div>
+          <div class="reader-info-row">
+            <span class="reader-info-label">阅读计时</span>
+            <span id="readingTimer" class="reader-timer">00:00</span>
+          </div>
+          <p class="reader-hint">点击正文中的英文单词即可查看释义并收藏到生词本。</p>
+          <div id="readerContent" class="reader-content"></div>
+        </article>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="底部导航">
+      <button class="nav-item is-active" type="button" data-nav="today">
+        <span class="nav-label">今日</span>
+      </button>
+      <button class="nav-item" type="button" data-nav="library">
+        <span class="nav-label">文章库</span>
+      </button>
+      <button class="nav-item" type="button" data-nav="vocab">
+        <span class="nav-label">生词本</span>
+      </button>
+    </nav>
+
+    <div id="definitionModal" class="modal is-hidden" role="dialog" aria-modal="true" aria-labelledby="definitionWord">
+      <div class="modal-backdrop" data-action="close-modal"></div>
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <p class="modal-kicker">点词释义</p>
+            <h3 id="definitionWord" class="modal-word"></h3>
+          </div>
+          <button class="icon-button" type="button" data-action="close-modal" aria-label="关闭释义卡片">关闭</button>
+        </div>
+        <p id="definitionLookupHint" class="modal-hint"></p>
+        <div class="definition-block">
+          <p class="definition-label">中文释义</p>
+          <p id="definitionZh" class="definition-text"></p>
+        </div>
+        <div class="definition-block">
+          <p class="definition-label">英文释义</p>
+          <p id="definitionEn" class="definition-text"></p>
+        </div>
+        <div class="definition-block">
+          <p class="definition-label">例句</p>
+          <p id="definitionExample" class="definition-text"></p>
+        </div>
+        <div class="definition-block">
+          <p class="definition-label">原文句子</p>
+          <p id="definitionSentence" class="definition-text definition-sentence"></p>
+        </div>
+        <button id="saveWordButton" class="primary-button" type="button" data-action="save-word">加入生词本</button>
+      </div>
+    </div>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -91,3 +91,11 @@ IELTS Knowledge Reader 是一个手机端 H5 雅思知识阅读器 MVP。
 - 后续注意事项：
   - 任何 UI / 颜色修改前必须先建立 Git 提交点
   - 后续视觉调整只能小范围修改，避免再次影响交互链路
+
+## GitHub Pages 手机端访问记录
+
+- GitHub Pages 地址：<https://jizw0704-source.github.io/ielts-knowledge-reader/>
+- 测试环境：手机微信内置浏览器
+- 测试结果：通过
+- 当前限制：`localStorage` 只在当前域名 / 浏览器内有效，不同访问地址之间不共享生词本
+- 后续建议：进入 V0.2 功能迭代前先新建分支

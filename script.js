@@ -95,6 +95,31 @@ function createCoreWordPills(coreWords) {
     .join('');
 }
 
+function countArticleWords(articleContent) {
+  const text = Array.isArray(articleContent) ? articleContent.join(' ') : String(articleContent || '');
+  const matches = text.match(/[A-Za-z]+(?:'[A-Za-z]+)?/g);
+  return matches ? matches.length : 0;
+}
+
+function getEstimatedReadingMinutes(wordCount) {
+  return Math.ceil(Math.max(0, Number(wordCount) || 0) / 160);
+}
+
+function formatWordCount(wordCount) {
+  return `约 ${Number(wordCount) || 0} words`;
+}
+
+function formatEstimatedReadingTime(minutes) {
+  return `建议阅读 ${Number(minutes) || 0} 分钟`;
+}
+
+function toLocalDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 const RAW_ARTICLES = [
   {
     id: 'the-hidden-intelligence-of-plants',
@@ -207,6 +232,8 @@ const DICTIONARY_ENTRIES = [
 const ARTICLES = RAW_ARTICLES.map((article) => ({
   ...article,
   coreWordSet: new Set(article.coreWords.map((word) => normalizeWord(word))),
+  wordCount: countArticleWords(article.content),
+  estimatedMinutes: getEstimatedReadingMinutes(countArticleWords(article.content)),
 }));
 
 const MOCK_DICTIONARY = Object.fromEntries(
@@ -224,6 +251,7 @@ const state = {
   returnView: 'today',
   activeArticleId: null,
   activeTag: '全部',
+  readingRecords: [],
   vocabulary: [],
   currentDefinition: null,
   currentWordContext: null,
@@ -238,6 +266,7 @@ window.addEventListener('beforeunload', stopReadingTimer);
 
 function init() {
   cacheDom();
+  state.readingRecords = loadReadingRecords();
   state.vocabulary = loadVocabulary();
   bindEvents();
   renderAllViews();
@@ -250,6 +279,7 @@ function cacheDom() {
   dom.readerBackButton = document.getElementById('readerBackButton');
   dom.todayView = document.getElementById('todayView');
   dom.libraryView = document.getElementById('libraryView');
+  dom.librarySectionTitle = document.getElementById('librarySectionTitle');
   dom.vocabView = document.getElementById('vocabView');
   dom.readerView = document.getElementById('readerView');
   dom.todayArticleCard = document.getElementById('todayArticleCard');
@@ -396,6 +426,9 @@ function renderTodayView() {
     return;
   }
 
+  const readingRecord = getReadingRecord(article.id);
+  const completed = Boolean(readingRecord);
+
   dom.todayArticleCard.innerHTML = `
     <div class="hero-header">
       <div>
@@ -408,6 +441,11 @@ function renderTodayView() {
       </div>
     </div>
     <p class="hero-subtitle">${escapeHtml(article.subtitle)}</p>
+    <div class="meta-chips">
+      <span class="meta-chip">${escapeHtml(formatWordCount(article.wordCount))}</span>
+      <span class="meta-chip">${escapeHtml(formatEstimatedReadingTime(article.estimatedMinutes))}</span>
+      <span class="meta-chip${completed ? ' is-highlight' : ''}">${completed ? '今日已完成' : '今日未完成'}</span>
+    </div>
     <div class="tag-row">${createTagPills(article.tags)}</div>
     <div class="summary-grid">
       <div class="summary-block">
@@ -434,6 +472,10 @@ function renderLibraryView() {
   renderTagFilters();
 
   const articles = getFilteredArticles();
+  dom.librarySectionTitle.textContent = state.activeTag === '全部'
+    ? `文章库｜共 ${articles.length} 篇`
+    : `当前筛选｜${articles.length} 篇`;
+
   if (!articles.length) {
     dom.libraryList.innerHTML = `
       <div class="empty-state">
@@ -454,19 +496,24 @@ function renderLibraryView() {
           <div>
             <h3 class="card-title">${escapeHtml(article.title)}</h3>
             <p class="card-subtitle">${escapeHtml(article.subtitle)}</p>
+            </div>
+            <span class="meta-chip is-highlight">${escapeHtml(article.difficulty)}</span>
           </div>
-          <span class="meta-chip is-highlight">${escapeHtml(article.difficulty)}</span>
-        </div>
-        <div class="tag-row">${createTagPills(article.tags)}</div>
-        <div class="summary-block">
-          <p class="summary-title">English Summary</p>
-          <p>${escapeHtml(article.summaryEn)}</p>
-        </div>
-        <div class="card-footer">
-          <span class="card-note">${escapeHtml(article.sourceType)} · ${formatDate(article.publishDate)}</span>
-          <button class="secondary-button" type="button" data-action="open-article" data-article-id="${escapeAttr(article.id)}">阅读文章</button>
-        </div>
-      </article>
+          <div class="tag-row">${createTagPills(article.tags)}</div>
+          <div class="summary-block">
+            <p class="summary-title">English Summary</p>
+            <p>${escapeHtml(article.summaryEn)}</p>
+          </div>
+          <div class="meta-chips">
+            <span class="meta-chip">${escapeHtml(formatWordCount(article.wordCount))}</span>
+            <span class="meta-chip">${escapeHtml(formatEstimatedReadingTime(article.estimatedMinutes))}</span>
+            <span class="meta-chip${getReadingRecord(article.id) ? ' is-highlight' : ''}">${getReadingRecord(article.id) ? '已读' : '未读'}</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-note">${escapeHtml(article.sourceType)} · ${formatDate(article.publishDate)}</span>
+            <button class="secondary-button" type="button" data-action="open-article" data-article-id="${escapeAttr(article.id)}">阅读文章</button>
+          </div>
+        </article>
     `)
     .join('');
 }
@@ -567,15 +614,21 @@ function renderReaderView() {
 
   dom.readerArticleTitle.textContent = article.title;
   dom.readerSubtitle.textContent = article.subtitle;
+  const readingRecord = getReadingRecord(article.id);
+  const completed = Boolean(readingRecord);
   dom.readerMetaChips.innerHTML = `
     <span class="meta-chip is-highlight">${escapeHtml(article.difficulty)}</span>
     <span class="meta-chip">${escapeHtml(article.sourceType)}</span>
+    <span class="meta-chip">${escapeHtml(formatWordCount(article.wordCount))}</span>
+    <span class="meta-chip">${escapeHtml(formatEstimatedReadingTime(article.estimatedMinutes))}</span>
+    <span class="meta-chip${completed ? ' is-highlight' : ''}">${completed ? '已完成阅读' : '未完成阅读'}</span>
     ${createTagPills(article.tags)}
   `;
 
   dom.readerContent.innerHTML = article.content
     .map((paragraph) => `<p class="reading-paragraph">${renderParagraph(paragraph, article)}</p>`)
-    .join('');
+    .join('')
+    + renderReadingCompletionBlock(article, readingRecord);
 
   dom.readingTimer.textContent = formatDuration(state.timerSeconds);
 }
@@ -601,6 +654,158 @@ function getSortedVocabulary() {
 
 function getDictionaryEntry(word) {
   return MOCK_DICTIONARY[normalizeWord(word)] || null;
+}
+
+function getReadingRecord(articleId) {
+  return state.readingRecords.find((item) => item.articleId === articleId) || null;
+}
+
+function loadReadingRecords() {
+  try {
+    const raw = localStorage.getItem('ielts_reader_reading_records');
+    if (!raw) {
+      return [];
+    }
+
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed
+      .map((item) => normalizeReadingRecord(item))
+      .filter(Boolean)
+      .reduce((accumulator, item) => {
+        const existingIndex = accumulator.findIndex((entry) => entry.articleId === item.articleId);
+        if (existingIndex >= 0) {
+          accumulator[existingIndex] = item;
+          return accumulator;
+        }
+        accumulator.push(item);
+        return accumulator;
+      }, []);
+  } catch {
+    return [];
+  }
+}
+
+function normalizeReadingRecord(item) {
+  if (!item || typeof item !== 'object') {
+    return null;
+  }
+
+  const articleId = String(item.articleId || '');
+  if (!articleId) {
+    return null;
+  }
+
+  const article = ARTICLE_MAP.get(articleId);
+  const completedAt = item.completedAt ? String(item.completedAt) : new Date().toISOString();
+  const date = item.date ? String(item.date) : toLocalDateKey(new Date(completedAt));
+  const wordCount = Number.isFinite(Number(item.wordCount)) && Number(item.wordCount) > 0
+    ? Number(item.wordCount)
+    : article?.wordCount || 0;
+  const estimatedMinutes = Number.isFinite(Number(item.estimatedMinutes)) && Number(item.estimatedMinutes) >= 0
+    ? Number(item.estimatedMinutes)
+    : getEstimatedReadingMinutes(wordCount);
+
+  return {
+    articleId,
+    title: String(item.title || article?.title || '未知文章'),
+    completedAt,
+    date,
+    durationSeconds: Math.max(0, Math.floor(Number(item.durationSeconds) || 0)),
+    wordCount,
+    estimatedMinutes,
+    tags: Array.isArray(item.tags) ? item.tags.map((tag) => String(tag)) : [...(article?.tags || [])],
+    difficulty: String(item.difficulty || article?.difficulty || ''),
+    reflection: String(item.reflection || ''),
+  };
+}
+
+function persistReadingRecords() {
+  try {
+    localStorage.setItem('ielts_reader_reading_records', JSON.stringify(state.readingRecords));
+  } catch (error) {
+    console.warn('Failed to persist reading records:', error);
+    showToast('阅读记录暂时无法保存');
+  }
+}
+
+function renderReadingCompletionBlock(article, record) {
+  const completed = Boolean(record);
+  const reflection = record?.reflection || '';
+  return `
+    <div class="summary-block reading-completion" data-article-id="${escapeAttr(article.id)}">
+      <div class="reading-completion-head">
+        <div>
+          <p class="summary-title">完成阅读</p>
+          <p class="card-note">完成后可以继续记录读后感，内容会保存在本地。</p>
+        </div>
+        <span class="meta-chip${completed ? ' is-highlight' : ''}">${completed ? '已完成阅读' : '未完成阅读'}</span>
+      </div>
+      <div class="cta-row">
+        <button class="primary-button" type="button" data-action="complete-reading" data-article-id="${escapeAttr(article.id)}">完成阅读</button>
+        <span class="card-note">会记录完成时间、阅读时长和文章统计</span>
+      </div>
+      <div class="reflection-panel${completed ? '' : ' is-hidden'}">
+        <label class="reflection-label" for="reflection-${escapeAttr(article.id)}">读后感</label>
+        <textarea
+          id="reflection-${escapeAttr(article.id)}"
+          class="reflection-input"
+          data-reflection-input
+          rows="4"
+          placeholder="写下你对这篇文章的理解、词汇收获或观点"
+        >${escapeHtml(reflection)}</textarea>
+        <div class="cta-row">
+          <button class="secondary-button" type="button" data-action="save-reflection" data-article-id="${escapeAttr(article.id)}">保存读后感</button>
+          <span class="card-note">可以再次编辑并保存</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function saveReadingRecord(article, { reflection, durationSeconds, preserveCompletionTime = false } = {}) {
+  const normalizedReflection = String(reflection ?? '');
+  const existingIndex = state.readingRecords.findIndex((item) => item.articleId === article.id);
+  const existingRecord = existingIndex >= 0 ? state.readingRecords[existingIndex] : null;
+  const now = new Date();
+  const nextRecord = {
+    articleId: article.id,
+    title: article.title,
+    completedAt: preserveCompletionTime && existingRecord ? existingRecord.completedAt : now.toISOString(),
+    date: preserveCompletionTime && existingRecord ? existingRecord.date : toLocalDateKey(now),
+    durationSeconds: Math.max(0, Math.floor(Number(durationSeconds) || 0)),
+    wordCount: article.wordCount,
+    estimatedMinutes: article.estimatedMinutes,
+    tags: [...article.tags],
+    difficulty: article.difficulty,
+    reflection: normalizedReflection,
+  };
+
+  if (existingIndex >= 0) {
+    state.readingRecords[existingIndex] = nextRecord;
+  } else {
+    state.readingRecords.unshift(nextRecord);
+  }
+
+  persistReadingRecords();
+  renderTodayView();
+  renderLibraryView();
+  renderReaderView();
+
+  return nextRecord;
+}
+
+function readCurrentReflectionDraft(articleId) {
+  const panel = dom.readerContent.querySelector(`.reading-completion[data-article-id="${escapeAttr(articleId)}"]`);
+  const textarea = panel ? panel.querySelector('[data-reflection-input]') : null;
+  if (!textarea) {
+    const record = getReadingRecord(articleId);
+    return record?.reflection || '';
+  }
+  return textarea.value || '';
 }
 
 function openArticle(articleId, originView = state.navView) {
@@ -987,4 +1192,67 @@ function showToast(message) {
   showToast.timerId = window.setTimeout(() => {
     dom.toast.classList.remove('is-visible');
   }, 1800);
+}
+
+function handleReaderClickV2(event) {
+  const actionButton = event.target.closest('[data-action]');
+  if (!actionButton) {
+    return;
+  }
+
+  const { action } = actionButton.dataset;
+
+  if (action === 'lookup-word') {
+    const word = actionButton.dataset.word || normalizeWord(actionButton.textContent);
+    const articleId = actionButton.dataset.articleId;
+    const sentence = actionButton.dataset.sentence || '';
+    const article = ARTICLE_MAP.get(articleId);
+    if (!article) {
+      return;
+    }
+
+    const dictionaryEntry = getDictionaryEntry(word);
+    const existingVocabularyItem = state.vocabulary.find((item) => item.word === word);
+
+    state.currentDefinition = dictionaryEntry;
+    state.currentWordContext = {
+      word,
+      articleId: article.id,
+      articleTitle: article.title,
+      sentence,
+      example: dictionaryEntry?.example || sentence,
+    };
+
+    dom.definitionWord.textContent = word;
+    dom.definitionLookupHint.textContent = dictionaryEntry
+      ? (existingVocabularyItem ? '已在生词本中，可继续更新记录。' : '已匹配内置 mockDictionary。')
+      : (existingVocabularyItem ? '已在生词本中，可继续更新记录。' : '暂未收录，可先加入生词本。');
+    dom.definitionZh.textContent = dictionaryEntry?.meaningZh || '暂未收录，可先加入生词本';
+    dom.definitionEn.textContent = dictionaryEntry?.meaningEn || 'This word is not yet included in the built-in mock dictionary.';
+    dom.definitionExample.textContent = dictionaryEntry?.example || sentence || '暂无例句';
+    dom.definitionSentence.textContent = sentence || '暂无原文句子';
+    dom.saveWordButton.textContent = existingVocabularyItem ? '更新到生词本' : '加入生词本';
+    dom.definitionModal.classList.remove('is-hidden');
+    return;
+  }
+
+  if (action === 'complete-reading' || action === 'save-reflection') {
+    const articleId = actionButton.dataset.articleId;
+    const article = ARTICLE_MAP.get(articleId);
+    if (!article) {
+      return;
+    }
+
+    const existingRecord = getReadingRecord(article.id);
+    const reflection = readCurrentReflectionDraft(article.id);
+
+    stopReadingTimer();
+    saveReadingRecord(article, {
+      reflection,
+      durationSeconds: existingRecord?.durationSeconds ?? state.timerSeconds,
+      preserveCompletionTime: Boolean(existingRecord),
+    });
+
+    showToast(action === 'complete-reading' ? '已完成阅读' : '读后感已保存');
+  }
 }

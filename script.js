@@ -229,19 +229,282 @@ const DICTIONARY_ENTRIES = [
   ['threshold', '阈值；临界点', 'a level or point at which something starts to happen', 'Heat becomes dangerous after a certain threshold.'],
 ];
 
+const EXTRA_DICTIONARY_BASE_ENTRIES = [
+  // Lemmatization-focused roots that should stay as base entries only.
+  ['city', '城市；城镇', 'a large town or urban area', 'Many families move to the city for work.', 'noun', false],
+  ['building', '建筑；大楼', 'a structure with walls and a roof', 'The building stays cool in the afternoon shade.', 'noun', false],
+  ['build', '建造；建立', 'to make something by putting parts together', 'Workers build the new bridge in stages.', 'verb', false],
+  ['use', '使用；运用', 'to put something to work for a purpose', 'Students use maps to understand the route.', 'verb', false],
+  ['redesign', '重新设计；改造', 'to design something again in a new way', 'Engineers redesign the street to improve safety.', 'verb', false],
+  ['hot', '热的；炎热的', 'having a high temperature', 'The pavement feels hot after noon.', 'adjective', false],
+  ['large', '大的；规模大的', 'big in size or amount', 'A large canopy can reduce direct sunlight.', 'adjective', false],
+  ['big', '大的；重要的', 'large in size or importance', 'The city made a big investment in cooling.', 'adjective', false],
+  ['common', '常见的；普遍的', 'frequently found or widely shared', 'Heat waves are becoming more common each year.', 'adjective', false],
+
+  // High-frequency verbs.
+  ['analyze', '分析；解析', 'to study something carefully by breaking it into parts', 'Researchers analyze the data before drawing conclusions.', 'verb'],
+  ['indicate', '表明；指出', 'to show or point to a fact or result', 'The dark color may indicate extra heat storage.', 'verb'],
+  ['suggest', '表明；建议', 'to make an idea seem likely or recommend it', 'The results suggest a stronger cooling effect.', 'verb'],
+  ['estimate', '估计；估算', 'to roughly judge the size or amount of something', 'Scientists estimate the reading time from the word count.', 'verb'],
+  ['reveal', '揭示；显示', 'to make something known or visible', 'The survey may reveal a hidden pattern.', 'verb'],
+  ['demonstrate', '证明；展示', 'to show clearly by evidence or action', 'The experiment demonstrates how shade lowers temperature.', 'verb'],
+  ['examine', '检查；审视', 'to look at something carefully', 'Doctors examine the student before practice begins.', 'verb'],
+  ['compare', '比较', 'to look at things side by side to see differences', 'Students compare two articles to find a shared theme.', 'verb'],
+  ['contrast', '对比；形成对照', 'to show clear differences between things', 'The writer contrasts old methods with new tools.', 'verb'],
+  ['classify', '分类；归类', 'to group things by shared qualities', 'Researchers classify the words by topic.', 'verb'],
+  ['define', '定义；界定', 'to explain the exact meaning of something', 'The glossary defines each key term clearly.', 'verb'],
+  ['identify', '识别；确认', 'to recognize and name something', 'Readers identify the main idea more quickly with practice.', 'verb'],
+  ['interpret', '解释；阐释', 'to explain what something means', 'Teachers interpret the data for the class.', 'verb'],
+  ['assess', '评估；判断', 'to judge the quality or value of something', 'The teacher assesses each reflection carefully.', 'verb'],
+  ['evaluate', '评估；评价', 'to judge the importance or quality of something', 'We evaluate the article after reading it.', 'verb'],
+  ['generate', '产生；生成', 'to produce or create something', 'The system can generate a reading summary.', 'verb'],
+  ['require', '需要；要求', 'to need something or make something necessary', 'This activity requires careful reading.', 'verb'],
+
+  // Article-friendly nouns and academic nouns.
+  ['factor', '因素', 'something that helps cause a result', 'Temperature is one factor that affects comfort.', 'noun'],
+  ['process', '过程；进程', 'a series of steps that leads to a result', 'Learning is a gradual process.', 'noun'],
+  ['method', '方法；手段', 'a way of doing something', 'The class uses a simple method to check answers.', 'noun'],
+  ['approach', '方法；途径', 'a way of dealing with a task or problem', 'A careful approach can reduce mistakes.', 'noun'],
+  ['theory', '理论', 'an idea that explains how something works', 'The theory helps explain the pattern.', 'noun'],
+  ['concept', '概念', 'an idea that people think about or understand', 'The concept of resilience appears often in the article.', 'noun'],
+  ['pattern', '模式；规律', 'a repeated design or way in which things happen', 'A clear pattern appears across the charts.', 'noun'],
+  ['structure', '结构；组织方式', 'the way parts are arranged and connected', 'The structure of the paragraph is very clear.', 'noun'],
+  ['function', '功能；作用', 'the purpose of something', 'The function of a sensor is to detect change.', 'noun'],
+  ['impact', '影响；冲击', 'the effect that something has on a person or thing', 'Heat has a strong impact on daily life.', 'noun'],
+  ['consequence', '结果；后果', 'something that happens because of another action', 'A small delay can have a large consequence.', 'noun'],
+  ['benefit', '益处；好处', 'something useful or positive', 'A cooler street brings a clear benefit to residents.', 'noun'],
+  ['challenge', '挑战；难题', 'a difficult task or problem', 'The design challenge is to save energy and stay safe.', 'noun'],
+  ['feature', '特征；特点', 'an important part or quality of something', 'A key feature of the system is its speed.', 'noun'],
+  ['context', '语境；背景', 'the situation or information around an event', 'Word meaning depends on context.', 'noun'],
+  ['role', '角色；作用', 'the part something plays', 'Trees play a role in cooling the street.', 'noun'],
+  ['source', '来源；源头', 'the place where something comes from', 'The source of the signal is easy to trace.', 'noun'],
+  ['result', '结果；成果', 'something that happens because of an action', 'The result shows clear improvement.', 'noun'],
+  ['policy', '政策；方针', 'an official plan or rule', 'The city introduced a new heat policy.', 'noun'],
+  ['community', '社区；群体', 'a group of people who live or work together', 'The community shared cooling information quickly.', 'noun'],
+  ['heat', '热；热量', 'the quality of being hot', 'The heat built up during the afternoon.', 'noun', false],
+  ['resident', '居民；住户', 'a person who lives in a place', 'Every resident received a cooling alert.', 'noun'],
+  ['transport', '交通；运输', 'the movement of people or goods', 'Public transport stayed open during the heat warning.', 'noun'],
+  ['material', '材料；资料', 'the substance something is made from', 'Light-colored material can reduce heat absorption.', 'noun'],
+  ['cooling', '降温；冷却', 'the process of making something less hot', 'Cooling is easier when the room has shade.', 'noun', false],
+  ['shade', '阴影；遮荫', 'an area that is protected from direct sunlight', 'Shade helps people rest on hot days.', 'noun'],
+  ['vegetation', '植被；植物群', 'plants growing in an area', 'Vegetation can help the city stay cooler.', 'noun', false],
+  ['emission', '排放；释放物', 'something that is released into the air', 'Lower emission levels support cleaner air.', 'noun'],
+
+  // Simple adjectives without extra forms.
+  ['effective', '有效的；起作用的', 'successful in producing the desired result', 'This is an effective strategy for reading.', 'adjective'],
+  ['efficient', '高效的；效率高的', 'doing something well without wasting time or energy', 'The new route is more efficient.', 'adjective'],
+  ['stable', '稳定的；不变的', 'not likely to change suddenly', 'A stable system helps the lesson run smoothly.', 'adjective'],
+  ['reliable', '可靠的；可信赖的', 'able to be trusted or depended on', 'The notes are reliable and easy to review.', 'adjective'],
+  ['visible', '可见的；明显的', 'easy to see or notice', 'The word is visible on the page.', 'adjective'],
+  ['natural', '自然的；天然的', 'existing in nature rather than made by people', 'Natural shade can cool the path.', 'adjective'],
+  ['artificial', '人工的；人造的', 'made by people rather than nature', 'Artificial light is useful at night.', 'adjective'],
+  ['public', '公共的；面向公众的', 'for everyone to use', 'Public space needs careful planning.', 'adjective'],
+  ['local', '本地的；当地的', 'relating to a nearby place', 'Local streets can become hot quickly.', 'adjective'],
+  ['global', '全球的；全世界的', 'relating to the whole world', 'Global climate change affects many cities.', 'adjective'],
+];
+
+function createDictionaryEntry(meaningZh, meaningEn, example) {
+  return {
+    meaningZh,
+    meaningEn,
+    example,
+  };
+}
+
+function addDictionaryEntry(dictionary, word, entry) {
+  const normalized = normalizeWord(word);
+  if (!normalized || dictionary[normalized]) {
+    return;
+  }
+
+  dictionary[normalized] = entry;
+}
+
+function stripDoubleConsonant(word) {
+  if (!word || word.length < 3) {
+    return word;
+  }
+
+  const lastChar = word[word.length - 1];
+  const previousChar = word[word.length - 2];
+  if (lastChar === previousChar && !'aeiou'.includes(lastChar)) {
+    return word.slice(0, -1);
+  }
+
+  return word;
+}
+
+function pluralizeNoun(word) {
+  if (/[^aeiou]y$/i.test(word)) {
+    return `${word.slice(0, -1)}ies`;
+  }
+
+  if (/(s|x|z|ch|sh)$/i.test(word)) {
+    return `${word}es`;
+  }
+
+  return `${word}s`;
+}
+
+function getVerbForms(word) {
+  const normalized = normalizeWord(word);
+  const stemForPast = normalized.endsWith('e') ? normalized.slice(0, -1) : normalized;
+  const stemForGerund = normalized.endsWith('e') && !/(ee|ye|oe)$/i.test(normalized)
+    ? normalized.slice(0, -1)
+    : normalized;
+
+  const thirdPerson = /[^aeiou]y$/i.test(normalized)
+    ? `${normalized.slice(0, -1)}ies`
+    : /(s|x|z|ch|sh|o)$/i.test(normalized)
+      ? `${normalized}es`
+      : `${normalized}s`;
+
+  const pastTense = /[^aeiou]y$/i.test(normalized)
+    ? `${normalized.slice(0, -1)}ied`
+    : `${stemForPast}ed`;
+
+  const gerund = /ie$/i.test(normalized)
+    ? `${normalized.slice(0, -2)}ying`
+    : /[^aeiou]e$/i.test(normalized) && !/(ee|ye|oe)$/i.test(normalized)
+      ? `${stemForGerund}ing`
+      : `${normalized}ing`;
+
+  return {
+    thirdPerson,
+    pastTense,
+    gerund,
+  };
+}
+
+function buildMockDictionary() {
+  const dictionary = Object.create(null);
+
+  DICTIONARY_ENTRIES.forEach(([word, meaningZh, meaningEn, example]) => {
+    addDictionaryEntry(dictionary, word, createDictionaryEntry(meaningZh, meaningEn, example));
+  });
+
+  EXTRA_DICTIONARY_BASE_ENTRIES.forEach((item) => {
+    const entry = createDictionaryEntry(item.meaningZh, item.meaningEn, item.example);
+    addDictionaryEntry(dictionary, item.word, entry);
+
+    if (item.generateForms === false) {
+      return;
+    }
+
+    if (item.partOfSpeech === 'verb') {
+      const forms = getVerbForms(item.word);
+      Object.values(forms).forEach((form) => addDictionaryEntry(dictionary, form, entry));
+      return;
+    }
+
+    if (item.partOfSpeech === 'noun') {
+      addDictionaryEntry(dictionary, pluralizeNoun(item.word), entry);
+    }
+  });
+
+  return dictionary;
+}
+
+const LEMMA_EXCEPTIONS = new Map([
+  ['cities', 'city'],
+  ['species', 'species'],
+  ['resources', 'resource'],
+  ['buildings', 'building'],
+  ['redesigned', 'redesign'],
+  ['adapted', 'adapt'],
+  ['used', 'use'],
+  ['using', 'use'],
+  ['hotter', 'hot'],
+  ['larger', 'large'],
+  ['biggest', 'big'],
+]);
+
+function getDictionaryCandidates(word) {
+  const normalized = normalizeWord(word);
+  const candidates = [];
+  const addCandidate = (candidate) => {
+    if (candidate && !candidates.includes(candidate)) {
+      candidates.push(candidate);
+    }
+  };
+
+  addCandidate(normalized);
+  addCandidate(LEMMA_EXCEPTIONS.get(normalized));
+
+  if (normalized.endsWith('ies') && normalized.length > 4) {
+    addCandidate(`${normalized.slice(0, -3)}y`);
+  }
+
+  if (normalized.endsWith('ves') && normalized.length > 4) {
+    addCandidate(`${normalized.slice(0, -3)}f`);
+    addCandidate(`${normalized.slice(0, -3)}fe`);
+  }
+
+  if (normalized.endsWith('es') && /(ses|xes|zes|ches|shes)$/i.test(normalized)) {
+    addCandidate(normalized.slice(0, -2));
+  }
+
+  if (normalized.endsWith('s') && normalized.length > 3 && !normalized.endsWith('ss')) {
+    addCandidate(normalized.slice(0, -1));
+  }
+
+  if (normalized.endsWith('ied') && normalized.length > 4) {
+    addCandidate(`${normalized.slice(0, -3)}y`);
+  }
+
+  if (normalized.endsWith('ed') && normalized.length > 3) {
+    const stem = normalized.slice(0, -2);
+    addCandidate(stem);
+    addCandidate(`${stem}e`);
+    addCandidate(stripDoubleConsonant(stem));
+  }
+
+  if (normalized.endsWith('ing') && normalized.length > 4) {
+    const stem = normalized.slice(0, -3);
+    addCandidate(stem);
+    addCandidate(`${stem}e`);
+    addCandidate(stripDoubleConsonant(stem));
+  }
+
+  if (normalized.endsWith('er') && normalized.length > 4) {
+    const stem = normalized.slice(0, -2);
+    addCandidate(stem);
+    addCandidate(`${stem}e`);
+    addCandidate(stripDoubleConsonant(stem));
+  }
+
+  if (normalized.endsWith('est') && normalized.length > 5) {
+    const stem = normalized.slice(0, -3);
+    addCandidate(stem);
+    addCandidate(`${stem}e`);
+    addCandidate(stripDoubleConsonant(stem));
+  }
+
+  return candidates;
+}
+
+function findDictionaryEntry(word) {
+  const candidates = normalizeWordCandidates(word);
+  for (const candidate of candidates) {
+    if (MOCK_DICTIONARY[candidate]) {
+      return {
+        matchedWord: candidate,
+        entry: MOCK_DICTIONARY[candidate],
+      };
+    }
+  }
+
+  return null;
+}
+
+const MOCK_DICTIONARY = buildMockDictionary();
+
 const ARTICLES = RAW_ARTICLES.map((article) => ({
   ...article,
   coreWordSet: new Set(article.coreWords.map((word) => normalizeWord(word))),
   wordCount: countArticleWords(article.content),
   estimatedMinutes: getEstimatedReadingMinutes(countArticleWords(article.content)),
 }));
-
-const MOCK_DICTIONARY = Object.fromEntries(
-  DICTIONARY_ENTRIES.map(([word, meaningZh, meaningEn, example]) => [
-    normalizeWord(word),
-    { meaningZh, meaningEn, example },
-  ]),
-);
 
 const ARTICLE_MAP = new Map(ARTICLES.map((article) => [article.id, article]));
 
@@ -323,7 +586,7 @@ function bindEvents() {
   dom.vocabList.addEventListener('click', handleVocabActionV2);
   dom.vocabList.addEventListener('change', handleVocabChangeV2);
   dom.tagFilterBar.addEventListener('click', handleTagFilter);
-  dom.readerContent.addEventListener('click', handleReaderClickV2);
+  dom.readerContent.addEventListener('click', handleReaderClickActionV2);
   dom.definitionModal.addEventListener('click', handleModalClick);
   dom.saveWordButton.addEventListener('click', handleSaveCurrentWordV2);
 
@@ -653,7 +916,7 @@ function getSortedVocabulary() {
 }
 
 function getDictionaryEntry(word) {
-  return MOCK_DICTIONARY[normalizeWord(word)] || null;
+  return findDictionaryEntry(word)?.entry || null;
 }
 
 function getReadingRecord(articleId) {
@@ -1194,6 +1457,73 @@ function showToast(message) {
   }, 1800);
 }
 
+function handleReaderClickActionV2(event) {
+  const actionButton = event.target.closest('[data-action]');
+  if (!actionButton) {
+    return;
+  }
+
+  const { action } = actionButton.dataset;
+
+  if (action === 'lookup-word') {
+    const word = actionButton.dataset.word || normalizeWord(actionButton.textContent);
+    const articleId = actionButton.dataset.articleId;
+    const sentence = actionButton.dataset.sentence || '';
+    const article = ARTICLE_MAP.get(articleId);
+    if (!article) {
+      return;
+    }
+
+    const lookupResult = findDictionaryEntry(word);
+    const dictionaryEntry = lookupResult?.entry || null;
+    const matchedWord = lookupResult?.matchedWord || normalizeWord(word);
+    const normalizedWord = normalizeWord(word);
+    const existingVocabularyItem = state.vocabulary.find((item) => item.word === normalizedWord);
+
+    state.currentDefinition = dictionaryEntry;
+    state.currentWordContext = {
+      word,
+      matchedWord,
+      articleId: article.id,
+      articleTitle: article.title,
+      sentence,
+      example: dictionaryEntry?.example || sentence,
+    };
+
+    dom.definitionWord.textContent = word;
+    dom.definitionLookupHint.textContent = dictionaryEntry
+      ? `查询词：${word}；匹配词：${matchedWord}。${existingVocabularyItem ? '该词已在生词本中，可继续更新记录。' : '已命中内置 mockDictionary。'}`
+      : `查询词：${word}；暂未收录该词。可先加入生词本，后续可补充释义。生词本中会保存原词、来源文章、来源句子。`;
+    dom.definitionZh.textContent = dictionaryEntry?.meaningZh || '暂未收录该词，可先加入生词本';
+    dom.definitionEn.textContent = dictionaryEntry?.meaningEn || 'This word is not yet included in the built-in mock dictionary.';
+    dom.definitionExample.textContent = dictionaryEntry?.example || sentence || '暂无例句，可先记录原文句子。';
+    dom.definitionSentence.textContent = sentence || '暂无原文句子';
+    dom.saveWordButton.textContent = existingVocabularyItem ? '更新到生词本' : '加入生词本';
+    dom.definitionModal.classList.remove('is-hidden');
+    return;
+  }
+
+  if (action === 'complete-reading' || action === 'save-reflection') {
+    const articleId = actionButton.dataset.articleId;
+    const article = ARTICLE_MAP.get(articleId);
+    if (!article) {
+      return;
+    }
+
+    const existingRecord = getReadingRecord(article.id);
+    const reflection = readCurrentReflectionDraft(article.id);
+
+    stopReadingTimer();
+    saveReadingRecord(article, {
+      reflection,
+      durationSeconds: existingRecord?.durationSeconds ?? state.timerSeconds,
+      preserveCompletionTime: Boolean(existingRecord),
+    });
+
+    showToast(action === 'complete-reading' ? '已完成阅读' : '读后感已保存');
+  }
+}
+
 function handleReaderClickV2(event) {
   const actionButton = event.target.closest('[data-action]');
   if (!actionButton) {
@@ -1256,3 +1586,276 @@ function handleReaderClickV2(event) {
     showToast(action === 'complete-reading' ? '已完成阅读' : '读后感已保存');
   }
 }
+const ARTICLE_COVERAGE_ENTRIES = [
+  ['the', '定冠词，用于特指某人或某物', 'the definite article used to refer to a specific noun', 'function'],
+  ['a', '不定冠词，表示一个；某个', 'an indefinite article used before a singular noun', 'function'],
+  ['an', '不定冠词，表示一个；某个', 'an indefinite article used before a vowel sound', 'function'],
+  ['of', '介词，表示……的；属于；关于', 'a preposition used to show relation or possession', 'preposition'],
+  ['to', '介词/不定式标记，表示到；向；为了', 'a word used to show direction or purpose', 'preposition'],
+  ['in', '介词，表示在……里面；在……期间', 'a preposition showing place, time, or state', 'preposition'],
+  ['on', '介词，表示在……上；关于', 'a preposition showing position or topic', 'preposition'],
+  ['by', '介词，表示由；通过；在……旁边', 'a preposition showing method or agent', 'preposition'],
+  ['with', '介词，表示和；带有；用', 'a preposition showing connection or instrument', 'preposition'],
+  ['from', '介词，表示来自；从……开始', 'a preposition showing source or starting point', 'preposition'],
+  ['and', '连词，表示和；并且', 'a conjunction used to join ideas', 'function'],
+  ['or', '连词，表示或者', 'a conjunction used to show choice', 'function'],
+  ['but', '连词，表示但是；然而', 'a conjunction used to show contrast', 'function'],
+  ['as', '介词/连词，表示作为；当……时', 'a word used to show role or time', 'function'],
+  ['for', '介词，表示为了；给；持续时间', 'a preposition showing purpose or recipient', 'preposition'],
+  ['into', '介词，表示进入；变成', 'a preposition showing movement to the inside', 'preposition'],
+  ['between', '介词，表示在……之间', 'a preposition used for two or more things in a group', 'preposition'],
+  ['during', '介词，表示在……期间', 'a preposition used for a period of time', 'preposition'],
+  ['after', '介词/连词，表示在……之后', 'a word used for later time', 'function'],
+  ['before', '介词/连词，表示在……之前', 'a word used for earlier time', 'function'],
+  ['while', '连词，表示当……的时候；同时', 'a conjunction used for simultaneous actions', 'function'],
+  ['when', '连词/副词，表示何时；当……时', 'a word used to ask or show time', 'function'],
+  ['that', '代词/连词，表示那；引导从句', 'a word used to point to or connect ideas', 'function'],
+  ['this', '代词/限定词，表示这个', 'a word used to point to one thing near the speaker', 'function'],
+  ['these', '代词/限定词，表示这些', 'a word used to point to more than one thing near the speaker', 'function'],
+  ['those', '代词/限定词，表示那些', 'a word used to point to more than one thing farther away', 'function'],
+  ['it', '代词，表示它', 'a pronoun used for a thing, idea, or situation', 'pronoun'],
+  ['its', '物主代词，表示它的', 'a possessive form showing something belongs to it', 'pronoun'],
+  ['their', '物主代词，表示他们的；它们的', 'a possessive form showing something belongs to them', 'pronoun'],
+  ['they', '代词，表示他们；它们', 'a pronoun used for more than one person or thing', 'pronoun'],
+  ['them', '代词，表示他们；它们（宾格）', 'an object pronoun for more than one person or thing', 'pronoun'],
+  ['we', '代词，表示我们', 'a pronoun used for the speaker and others', 'pronoun'],
+  ['our', '物主代词，表示我们的', 'a possessive form showing something belongs to us', 'pronoun'],
+  ['you', '代词，表示你；你们', 'a pronoun used when speaking to someone', 'pronoun'],
+  ['your', '物主代词，表示你的；你们的', 'a possessive form showing something belongs to you', 'pronoun'],
+  ['each', '每一个；每个', 'used to talk about every person or thing separately', 'function'],
+  ['every', '每一个的；每位的', 'used to talk about all members of a group', 'function'],
+  ['all', '全部；所有', 'used to mean the whole amount or number', 'function'],
+  ['some', '一些；若干', 'used to refer to part of a group or amount', 'function'],
+  ['any', '任何；一些', 'used to refer to an unspecified amount or person', 'function'],
+  ['many', '许多', 'a large number of people or things', 'function'],
+  ['more', '更多的；更大程度地', 'a word used to show a larger amount or degree', 'function'],
+  ['most', '最多的；大多数', 'the greatest amount or the largest part', 'function'],
+  ['not', '不；没有', 'a word used to make a sentence negative', 'function'],
+  ['no', '没有；不', 'a word used to say something does not exist or is false', 'function'],
+  ['because', '因为', 'a conjunction used to show reason', 'function'],
+  ['if', '如果；是否', 'a word used to show a condition', 'function'],
+  ['than', '比；而不是', 'a word used in comparison', 'function'],
+  ['then', '然后；当时', 'a word used to show time or result', 'function'],
+  ['there', '那里；有', 'a word used to show place or existence', 'function'],
+  ['here', '这里；在这里', 'a word used to show a nearby place', 'function'],
+  ['where', '哪里；在……地方', 'a word used to ask about place', 'function'],
+  ['who', '谁', 'a word used to ask about people', 'function'],
+  ['whose', '谁的', 'a word used to ask about possession', 'function'],
+  ['can', '能；可以', 'a modal verb used to show ability or possibility', 'auxiliary'],
+  ['could', '能够；可以', 'a modal verb used for ability or possibility in the past or polite speech', 'auxiliary'],
+  ['should', '应该', 'a modal verb used to give advice or expectation', 'auxiliary'],
+  ['would', '会；将会；愿意', 'a modal verb used for imagined or polite situations', 'auxiliary'],
+  ['may', '可以；可能', 'a modal verb used to show possibility or permission', 'auxiliary'],
+  ['might', '可能；也许', 'a modal verb used to show weak possibility', 'auxiliary'],
+  ['will', '将；会', 'a modal verb used for future actions', 'auxiliary'],
+  ['must', '必须；一定', 'a modal verb used to show necessity', 'auxiliary'],
+  ['be', '是；存在；成为', 'a linking verb used to show identity or state', 'auxiliary'],
+  ['is', '是', 'the present form of be for singular subjects', 'auxiliary'],
+  ['are', '是', 'the present form of be for plural subjects', 'auxiliary'],
+  ['was', '是；曾是', 'the past form of be for singular subjects', 'auxiliary'],
+  ['were', '是；曾是', 'the past form of be for plural subjects', 'auxiliary'],
+  ['been', 'be 的过去分词', 'the past participle form of be', 'auxiliary'],
+  ['being', 'be 的现在分词', 'the -ing form of be', 'auxiliary'],
+  ['have', '有；拥有', 'a verb used to show possession or form perfect tenses', 'auxiliary'],
+  ['has', '有；拥有', 'the third-person singular form of have', 'auxiliary'],
+  ['had', '有；曾有', 'the past tense of have', 'auxiliary'],
+  ['do', '做；进行', 'a verb used for actions and questions', 'verb'],
+  ['does', '做；进行', 'the third-person singular form of do', 'verb'],
+  ['did', '做；进行', 'the past tense of do', 'verb'],
+  ['done', '已做的；完成的', 'the past participle form of do', 'verb'],
+  ['make', '制作；使成为；形成', 'to create or cause something to happen', 'verb'],
+  ['become', '变成；成为', 'to begin to be something', 'verb'],
+  ['provide', '提供；供给', 'to supply something that is needed', 'verb'],
+  ['reduce', '减少；降低', 'to make something smaller or less', 'verb'],
+  ['show', '显示；表明', 'to make something visible or clear', 'verb'],
+  ['help', '帮助；有助于', 'to make something easier or better', 'verb'],
+  ['change', '改变；变化', 'to make or become different', 'verb'],
+  ['design', '设计；构思', 'to plan or create something carefully', 'verb'],
+  ['create', '创造；创建', 'to make something new', 'verb'],
+  ['support', '支持；帮助', 'to give help or make something stronger', 'verb'],
+  ['protect', '保护；防护', 'to keep something safe from harm', 'verb'],
+  ['record', '记录；录制', 'to write down or store information', 'verb'],
+  ['live', '居住；生活', 'to exist or stay in a place', 'verb'],
+  ['work', '工作；起作用', 'to do a job or function well', 'verb'],
+  ['move', '移动；搬动', 'to go from one place to another', 'verb'],
+  ['need', '需要', 'to require something', 'verb'],
+  ['allow', '允许；使能够', 'to make something possible or let it happen', 'verb'],
+  ['keep', '保持；保留', 'to continue to have or hold something', 'verb'],
+  ['stay', '停留；保持', 'to remain in one place or state', 'verb'],
+  ['look', '看；看起来', 'to direct your eyes or attention', 'verb'],
+  ['think', '想；认为', 'to use your mind to form an idea', 'verb'],
+  ['know', '知道；了解', 'to have information or understanding', 'verb'],
+  ['find', '找到；发现', 'to discover or locate something', 'verb'],
+  ['give', '给；提供', 'to pass something to someone', 'verb'],
+  ['take', '拿；带走', 'to carry something away or accept it', 'verb'],
+  ['bring', '带来；引起', 'to carry something to a place', 'verb'],
+  ['leave', '离开；留下', 'to go away from a place', 'verb'],
+  ['feel', '感觉；觉得', 'to experience a physical or emotional state', 'verb'],
+  ['see', '看见；理解', 'to notice with the eyes', 'verb'],
+  ['say', '说；表示', 'to speak or state something', 'verb'],
+  ['tell', '告诉；讲述', 'to give information to someone', 'verb'],
+  ['watch', '观看；观察', 'to look at something carefully', 'verb'],
+  ['learn', '学习；得知', 'to gain knowledge or skill', 'verb'],
+  ['understand', '理解；明白', 'to know the meaning of something', 'verb'],
+  ['study', '学习；研究', 'to look at something carefully to learn', 'verb'],
+  ['grow', '生长；增长', 'to become larger or develop', 'verb'],
+  ['connect', '连接；联系', 'to join or link things together', 'verb'],
+  ['damage', '损害；破坏', 'to harm or spoil something', 'verb'],
+  ['warn', '警告；提醒', 'to tell someone about danger', 'verb'],
+  ['detect', '发现；察觉', 'to notice or discover something', 'verb'],
+  ['prepare', '准备；预备', 'to get ready for something', 'verb'],
+  ['release', '释放；发布', 'to let something go or make it available', 'verb'],
+  ['share', '分享；共享', 'to let others use or know something', 'verb'],
+  ['depend', '依赖；取决于', 'to rely on something', 'verb'],
+  ['coordinate', '协调；统筹', 'to organize different parts so they work together', 'verb'],
+  ['invest', '投资；投入', 'to put time or money into something', 'verb'],
+  ['avoid', '避免；躲开', 'to stay away from something', 'verb'],
+  ['improve', '改进；提升', 'to make something better', 'verb'],
+  ['shape', '塑造；形成', 'to influence the form of something', 'verb'],
+  ['control', '控制；掌控', 'to direct or manage something', 'verb'],
+  ['continue', '继续；持续', 'to keep going without stopping', 'verb'],
+  ['separate', '分开；分离', 'to divide or keep apart', 'verb'],
+  ['represent', '代表；表示', 'to stand for something', 'verb'],
+  ['organize', '组织；安排', 'to arrange things in order', 'verb'],
+  ['borrow', '借用；借鉴', 'to take something for a short time or use an idea from somewhere else', 'verb'],
+  ['tolerate', '忍受；耐受', 'to accept something difficult without giving up', 'verb'],
+  ['collapse', '倒塌；崩溃', 'to fall down or fail suddenly', 'verb'],
+  ['adjust', '调整；适应', 'to change slightly to fit new conditions', 'verb'],
+  ['expand', '扩大；扩展', 'to become or make something larger', 'verb'],
+  ['reflect', '反射；反映', 'to send back light, heat, or an idea', 'verb'],
+  ['absorb', '吸收；吸取', 'to take in heat, liquid, or information', 'verb'],
+  ['evaporate', '蒸发；挥发', 'to change from liquid into gas', 'verb'],
+  ['block', '阻挡；阻塞', 'to stop movement or light', 'verb'],
+  ['guide', '引导；指导', 'to lead or help someone', 'verb'],
+  ['explain', '解释；说明', 'to make something clear', 'verb'],
+  ['sense', '感觉到；察觉', 'to notice or feel something', 'verb'],
+  ['survive', '生存；幸存', 'to continue to live or exist', 'verb'],
+  ['quiet', '安静的；沉默的', 'making little or no noise', 'adjective'],
+  ['recent', '最近的；新近的', 'happening not long ago', 'adjective'],
+  ['story', '故事；情况', 'a description of events or facts', 'noun'],
+  ['single', '单一的；单个的', 'one only', 'adjective'],
+  ['center', '中心；中央', 'the middle point of something', 'noun'],
+  ['precision', '精确；准确性', 'the quality of being exact', 'noun'],
+  ['field', '田地；领域', 'an area of land or a subject of study', 'noun'],
+  ['minute', '分钟；片刻', 'a unit of time or a very short time', 'noun'],
+  ['small', '小的；少量的', 'not large in size or amount', 'adjective'],
+  ['together', '一起；共同', 'with other people or things', 'adverb'],
+  ['closely', '密切地；紧密地', 'in a close or careful way', 'adverb'],
+  ['tied', '联系在一起的；绑住的', 'connected or attached', 'adjective'],
+  ['scientist', '科学家', 'a person who studies science', 'noun'],
+  ['fungal', '真菌的', 'relating to fungi', 'adjective'],
+  ['neighboring', '邻近的；相邻的', 'next to or near something else', 'adjective'],
+  ['human', '人的；人类的', 'relating to people', 'adjective'],
+  ['isolated', '孤立的；分离的', 'separated from others', 'adjective'],
+  ['unit', '单元；单位', 'one part of a larger whole', 'noun'],
+  ['member', '成员', 'a person who belongs to a group', 'noun'],
+  ['sugar', '糖；糖分', 'a sweet substance', 'noun'],
+  ['mineral', '矿物；矿物质', 'a natural substance found in the earth or food', 'noun'],
+  ['memory', '记忆；记忆力', 'the ability to remember things', 'noun'],
+  ['repeated', '重复的；反复的', 'done again and again', 'adjective'],
+  ['speed', '速度；速率', 'how fast something moves or happens', 'noun'],
+  ['stomata', '气孔', 'tiny openings on a plant leaf', 'noun'],
+  ['habitat', '栖息地；生境', 'the natural home of a plant or animal', 'noun'],
+  ['gene', '基因', 'a part of living cells that carries information', 'noun'],
+  ['experience', '经验；经历', 'knowledge gained from doing or living something', 'noun'],
+  ['practical', '实际的；实用的', 'useful in real situations', 'adjective'],
+  ['farmer', '农民；农场主', 'a person who grows crops or raises animals', 'noun'],
+  ['poor', '差的；贫穷的；贫乏的', 'not good enough or lacking resources', 'adjective'],
+  ['researcher', '研究人员；研究者', 'a person who studies a topic carefully', 'noun'],
+  ['agricultural', '农业的', 'related to farming', 'adjective'],
+  ['crop', '农作物；庄稼', 'plants grown for food or other use', 'noun'],
+  ['waste', '浪费；废弃物', 'to use carelessly or something no longer useful', 'noun'],
+  ['partner', '伙伴；合作方', 'a person or group that works with another', 'noun'],
+  ['planet', '行星；星球', 'a large object in space that goes around a star', 'noun'],
+  ['extreme', '极端的；极度的', 'very great or severe', 'adjective'],
+  ['dense', '密集的；稠密的', 'closely packed together', 'adjective'],
+  ['neighborhood', '社区；街区', 'an area where people live near each other', 'noun'],
+  ['concrete', '混凝土', 'a strong building material made from cement and stone', 'noun'],
+  ['glass', '玻璃', 'a hard transparent material', 'noun'],
+  ['warmth', '温暖；热量', 'the quality of being warm', 'noun'],
+  ['sunset', '日落；黄昏', 'the time when the sun goes down', 'noun'],
+  ['rural', '乡村的；农村的', 'related to the countryside', 'adjective'],
+  ['land', '土地；陆地', 'the surface of the earth not covered by water', 'noun'],
+  ['island', '岛屿', 'land surrounded by water', 'noun'],
+  ['health', '健康', 'the condition of the body or mind', 'noun'],
+  ['daily', '每日的；日常的', 'happening every day', 'adjective'],
+  ['elderly', '年老的；老年人的', 'older in age', 'adjective'],
+  ['child', '儿童；孩子', 'a young person', 'noun'],
+  ['children', '孩子们；儿童们', 'more than one child', 'noun'],
+  ['vulnerable', '脆弱的；易受伤害的', 'easily harmed or affected', 'adjective'],
+  ['relief', '缓解；宽慰', 'help that makes a bad situation better', 'noun'],
+  ['roof', '屋顶', 'the top covering of a building', 'noun'],
+  ['paving', '铺路材料；铺装', 'material used to make a road or path', 'noun'],
+  ['lighter', '更轻的；更浅色的', 'having less weight or a paler color', 'adjective'],
+  ['storage', '储存；存储', 'the act of keeping something for later', 'noun'],
+  ['airflow', '气流', 'the movement of air', 'noun'],
+  ['district', '地区；区域', 'an area of a city or country', 'noun'],
+  ['service', '服务；公共服务', 'a system that helps people', 'noun'],
+  ['risk', '风险；危险', 'the chance of harm or loss', 'noun'],
+  ['official', '官员；官方的', 'a person in authority or something approved by authority', 'noun'],
+  ['regularity', '规律性；定期性', 'the quality of happening at fixed times', 'noun'],
+  ['tower', '塔；高楼', 'a tall building or structure', 'noun'],
+  ['digital', '数字的；数码的', 'using electronic data or numbers', 'adjective'],
+  ['satellite', '卫星', 'an object that moves around a planet or sends signals', 'noun'],
+  ['paradox', '悖论；矛盾现象', 'a situation that seems self-contradictory', 'noun'],
+  ['exact', '精确的；准确的', 'correct and very detailed', 'adjective'],
+  ['relevant', '相关的；切题的', 'connected to the topic', 'adjective'],
+  ['anxious', '焦虑的；不安的', 'worried or nervous', 'adjective'],
+  ['continue', '继续；持续', 'to keep going without stopping', 'verb'],
+];
+
+function buildCoverageExample(category) {
+  const templates = {
+    function: 'This small word helps connect ideas in a sentence.',
+    preposition: 'This word shows a relationship between words.',
+    pronoun: 'This word can point to people or things already mentioned.',
+    auxiliary: 'This word helps form a full sentence.',
+    verb: 'Readers can use this word when talking about the topic.',
+    noun: 'The article uses this word to name an important thing.',
+    adjective: 'The article uses this word to describe a quality.',
+    adverb: 'The article uses this word to describe how something happens.',
+  };
+
+  return templates[category] || 'This word appears in reading practice.';
+}
+
+function normalizeWordCandidates(word) {
+  return getDictionaryCandidates(word);
+}
+
+function extractArticleVocabulary() {
+  const vocabulary = new Set();
+
+  RAW_ARTICLES.forEach((article) => {
+    const text = Array.isArray(article.content) ? article.content.join(' ') : String(article.content || '');
+    const matches = text.match(/[A-Za-z]+(?:'[A-Za-z]+)?/g) || [];
+
+    matches.forEach((token) => {
+      const normalized = normalizeWord(token);
+      if (normalized) {
+        vocabulary.add(normalized);
+      }
+    });
+  });
+
+  return Array.from(vocabulary).sort((a, b) => a.localeCompare(b));
+}
+
+function getDictionaryCoverageReport() {
+  const words = extractArticleVocabulary();
+  const missingWords = words.filter((word) => !findDictionaryEntry(word));
+  return {
+    totalWords: words.length,
+    coveredWords: words.length - missingWords.length,
+    missingWords,
+    coverageRate: words.length ? Number((((words.length - missingWords.length) / words.length) * 100).toFixed(2)) : 0,
+  };
+}
+
+function augmentMockDictionary(dictionary) {
+  ARTICLE_COVERAGE_ENTRIES.forEach(([word, meaningZh, meaningEn, category]) => {
+    addDictionaryEntry(dictionary, word, createDictionaryEntry(meaningZh, meaningEn, buildCoverageExample(category)));
+  });
+}
+
+augmentMockDictionary(MOCK_DICTIONARY);

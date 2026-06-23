@@ -3,10 +3,14 @@ const ALLOWED_FAMILIARITY = ['陌生', '认识', '掌握'];
 
 function normalizeWord(value) {
   return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/^[^a-z]+|[^a-z]+$/gi, '')
     .replace(/’/g, "'");
 }
+
+const WORD_TOKEN_PATTERN = /[A-Za-zÀ-ÿ]+(?:['’][A-Za-zÀ-ÿ]+)?/g;
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -62,11 +66,11 @@ function splitParagraphIntoSentences(paragraph) {
 }
 
 function tokenizeSentence(sentence, article) {
-  const tokens = String(sentence).match(/[A-Za-z]+(?:'[A-Za-z]+)?|[0-9]+(?:\.[0-9]+)?|[\s]+|[^A-Za-z0-9\s]+/g) || [sentence];
+  const tokens = String(sentence).match(/[A-Za-zÀ-ÿ]+(?:['’][A-Za-zÀ-ÿ]+)?|[0-9]+(?:\.[0-9]+)?|[\s]+|[^A-Za-z0-9À-ÿ\s]+/g) || [sentence];
 
   return tokens
     .map((token) => {
-      if (/^[A-Za-z]+(?:'[A-Za-z]+)?$/.test(token)) {
+      if (/^[A-Za-zÀ-ÿ]+(?:['’][A-Za-zÀ-ÿ]+)?$/.test(token)) {
         const normalized = normalizeWord(token);
         const isCore = article.coreWordSet.has(normalized);
         return `<button type="button" class="word-token${isCore ? ' is-core' : ''}" data-action="lookup-word" data-word="${escapeAttr(normalized)}" data-article-id="${escapeAttr(article.id)}" data-sentence="${escapeAttr(sentence.trim())}">${escapeHtml(token)}</button>`;
@@ -97,7 +101,7 @@ function createCoreWordPills(coreWords) {
 
 function countArticleWords(articleContent) {
   const text = Array.isArray(articleContent) ? articleContent.join(' ') : String(articleContent || '');
-  const matches = text.match(/[A-Za-z]+(?:'[A-Za-z]+)?/g);
+  const matches = text.match(WORD_TOKEN_PATTERN);
   return matches ? matches.length : 0;
 }
 
@@ -239,6 +243,321 @@ const DICTIONARY_ENTRIES = [
   ['moisture', '水分；湿气', 'a small amount of water in the air or soil', 'Roots observe moisture in the soil.'],
   ['defense', '防御；保护', 'protection from attack or harm', 'Plants prepare defense compounds after damage.'],
   ['threshold', '阈值；临界点', 'a level or point at which something starts to happen', 'Heat becomes dangerous after a certain threshold.'],
+  ['time', '时间', 'the measure of moments and periods', 'Time helps people organize daily life.'],
+  ['clock', '时钟；钟表', 'a device that shows or measures time', 'The clock on the wall struck six.'],
+  ['calendar', '日历；历法', 'a system for showing days, months, and years', 'She marked the exam date on her calendar.'],
+  ['astronomy', '天文学', 'the study of stars, planets, and space', 'Astronomy helped early societies read the sky.'],
+  ['sundial', '日晷', 'a device that tells time by a shadow', 'A sundial works when sunlight is strong.'],
+  ['hourglass', '沙漏', 'a device that measures time with sand', 'An hourglass can time a short speech.'],
+  ['liquid', '液体', 'a substance that flows and is not solid', 'Water is the most familiar liquid.'],
+  ['weather', '天气', 'the state of the atmosphere at a place and time', 'The weather changed before sunset.'],
+  ['order', '秩序；顺序', 'a state in which things are arranged or controlled', 'Order helps a city function well.'],
+  ['sun', '太阳', 'the star that gives Earth light and heat', 'The sun rises in the east.'],
+  ['moon', '月亮；月球', 'the object that circles the Earth', 'The moon was bright that night.'],
+  ['star', '星星；恒星', 'a shining object in the night sky', 'A star can guide a traveller.'],
+  ['sky', '天空', 'the space above the Earth where clouds and stars appear', 'The sky was clear after the rain.'],
+  ['date', '日期', 'a particular day or point in time', 'Please write the date at the top of the page.'],
+  ['festival', '节日；庆典', 'a special public event or celebration', 'The festival marks the start of spring.'],
+  ['prayer', '祈祷；祷告', 'words spoken to ask for help or thanks', 'The prayer lasted only a minute.'],
+  ['labour', '劳动；劳作', 'work, especially physical work', 'Farm labour was important in the past.'],
+  ['travel', '旅行；出行', 'to go from one place to another', 'Many people travel by train.'],
+  ['meet', '会见；见面', 'to come together or see someone', 'We meet in the library after class.'],
+  ['worship', '崇拜；敬拜', 'to show respect or devotion to a god', 'Many people worship in different ways.'],
+  ['rest', '休息；静止', 'to stop working or moving to recover energy', 'The driver rested for ten minutes.'],
+  ['accurate', '准确的；精确的', 'correct and without mistakes', 'The new clock is very accurate.'],
+  ['predictable', '可预测的；可预见的', 'easy to guess because it follows a pattern', 'The result became more predictable.'],
+  ['observation', '观察；观测', 'the act of watching carefully', 'Careful observation improves science.'],
+  ['scientific', '科学的', 'connected with science', 'Scientific methods depend on evidence.'],
+  ['development', '发展；开发', 'the process of growing or becoming more advanced', 'The development of the city changed the district.'],
+  ['collective', '集体的；共同的', 'shared by a group of people or things', 'The team made a collective decision.'],
+  ['ritual', '仪式；例行程序', 'a set of actions done in a fixed way', 'The ritual began at sunrise.'],
+  ['survival', '生存；存活', 'the act of continuing to live or exist', 'Water is essential for survival.'],
+  ['navigation', '导航；航行', 'the act of finding a route or position', 'Navigation at sea required accurate clocks.'],
+  ['sailor', '水手；海员', 'a person who works on a ship', 'The sailor checked the map.'],
+  ['position', '位置；姿势', 'the place something is in', 'The ship used the stars to find its position.'],
+  ['longitude', '经度', 'distance east or west of a reference line', 'Longitude was hard to measure at sea.'],
+  ['reference', '参照；参考', 'something used for comparison or guidance', 'The clock used a reference time.'],
+  ['chronometer', '精密计时器；航海钟', 'a very accurate timekeeping device', 'The chronometer helped the voyage succeed.'],
+  ['voyage', '航程；航行', 'a long journey by sea or in space', 'The voyage took several months.'],
+  ['factory', '工厂', 'a building where goods are made', 'The factory ran on a fixed schedule.'],
+  ['railway', '铁路', 'a system of tracks for trains', 'The railway connected the towns.'],
+  ['timetable', '时刻表', 'a plan showing when trains or buses arrive and leave', 'The timetable was updated daily.'],
+  ['timezone', '时区', 'a region that uses the same standard time', 'Different timezones make global work harder.'],
+  ['quartz', '石英', 'a hard mineral used in clocks and electronics', 'Quartz helps a clock keep time.'],
+  ['atomic', '原子的', 'relating to atoms', 'Atomic clocks are very precise.'],
+  ['synchronize', '同步；使同步', 'to make things happen at the same time', 'Phones synchronize their time automatically.'],
+  ['synchronization', '同步', 'the act of making things happen together', 'Synchronization keeps the network accurate.'],
+  ['timestamp', '时间戳', 'a mark showing when something happened', 'Each file had a timestamp.'],
+  ['satellite', '卫星', 'an object that moves around a planet or sends signals', 'A satellite can send time signals.'],
+  ['correction', '修正；纠正', 'a change made to fix an error', 'The correction improved the result.'],
+  ['household', '家庭；家用的', 'a home or the people living in one', 'Each household received the notice.'],
+  ['invisible', '看不见的；无形的', 'not able to be seen', 'The network is invisible underground.'],
+  ['global', '全球的；世界的', 'relating to the whole world', 'Global time systems need coordination.'],
+  ['economic', '经济的', 'relating to money, business, and trade', 'The change had an economic effect.'],
+  ['imperial', '帝国的；帝王的', 'relating to an empire', 'Imperial trade depended on fast ships.'],
+  ['expansion', '扩张；扩大', 'the process of becoming larger or wider', 'Expansion brought new towns and roads.'],
+  ['instrument', '仪器；工具', 'a tool or device used for a purpose', 'The clock became a scientific instrument.'],
+  ['data', '数据', 'facts or figures used for analysis', 'The data showed a clear trend.'],
+  ['information', '信息；资料', 'facts or knowledge about something', 'The report gives useful information.'],
+  ['root', '根；根系', 'the part of a plant that grows underground', 'The root absorbs water from the soil.'],
+  ['organism', '生物体', 'a living thing such as a plant, animal, or microbe', 'Each organism reacts to its environment.'],
+  ['passive', '被动的；静止的', 'not active or not doing much', 'The old model treated plants as passive.'],
+  ['nervous', '神经的；紧张的', 'connected with nerves or feeling worried', 'The nervous system is important in animals.'],
+  ['brain', '大脑；脑', 'the organ in the head used for thinking', 'Humans rely on the brain.'],
+  ['cell', '细胞', 'the smallest unit of a living thing', 'A plant cell has a strong wall.'],
+  ['hormone', '激素；荷尔蒙', 'a chemical in the body that affects growth or activity', 'The hormone controls growth patterns.'],
+  ['seedling', '幼苗', 'a young plant that has just started to grow', 'The seedling needed more water.'],
+  ['fungus', '真菌', 'a living thing such as a mold or mushroom', 'A fungus can live in moist soil.'],
+  ['mycorrhizal', '菌根的', 'relating to fungi and plant roots working together', 'Mycorrhizal links can help roots share resources.'],
+  ['ecology', '生态学；生态', 'the study of living things and their environment', 'Ecology explains how forests stay balanced.'],
+  ['restoration', '修复；恢复', 'the process of bringing something back to a better state', 'Restoration can rebuild damaged land.'],
+  ['irrigation', '灌溉', 'the supply of water to land or crops', 'Irrigation helps crops survive dry months.'],
+  ['yield', '产量；收益', 'the amount produced', 'Better soil can increase crop yield.'],
+  ['ecosystem', '生态系统', 'living things and the environment they depend on', 'The river ecosystem needs protection.'],
+  ['recovery', '恢复；复苏', 'the process of becoming healthy or strong again', 'Recovery after drought can take years.'],
+  ['stress', '压力；应激', 'mental or physical pressure', 'Stress can change how a plant grows.'],
+  ['consciousness', '意识', 'awareness of oneself and the world', 'Scientists debate the meaning of consciousness.'],
+  ['volatile', '挥发性的；易变的', 'changing quickly or easily evaporated', 'Volatile compounds spread through the air.'],
+  ['attack', '攻击；袭击', 'to try to harm or hurt', 'Insects attack the leaves at night.'],
+  ['insect', '昆虫', 'a small animal with six legs', 'An insect landed on the leaf.'],
+  ['defense', '防御；保护', 'protection from attack or harm', 'The plant used defense chemicals.'],
+  ['soil', '土壤', 'the top layer of earth where plants grow', 'The soil was dry after the heat wave.'],
+  ['growth', '生长；增长', 'the process of becoming larger', 'Growth slowed in the cold season.'],
+  ['touch', '触碰；接触', 'to make contact with something', 'The plant reacted to touch.'],
+  ['gravity', '重力', 'the force that pulls things toward the Earth', 'Gravity pulls roots downward.'],
+  ['direction', '方向', 'the way something moves or faces', 'The roots changed direction.'],
+  ['random', '随机的；无规律的', 'not planned or ordered', 'The choices did not seem random.'],
+  ['manner', '方式；方法', 'the way something is done', 'The answer was given in a calm manner.'],
+  ['forest', '森林', 'a large area covered with trees', 'A forest stores a lot of carbon.'],
+  ['agriculture', '农业', 'the practice of farming', 'Agriculture depends on water and soil.'],
+  ['exchange', '交换；交流', 'to give one thing and receive another', 'The two plants exchange signals underground.'],
+  ['response', '反应；回应', 'something done in answer to another thing', 'The body showed a quick response.'],
+  ['chemical', '化学的；化学物质', 'relating to chemicals or substances', 'Chemical changes can happen underground.'],
+  ['green', '绿色的；环保的', 'having the color of grass or plants', 'The park looked green after the rain.'],
+  ['blue', '蓝色的', 'having the color of the sky or sea', 'The cover of the book is blue.'],
+  ['light', '光；浅色的', 'energy that makes things visible', 'Light entered the room through the window.'],
+  ['cool', '凉快的；冷却', 'having a low temperature or making something less hot', 'A cool room is easier to study in.'],
+  ['reflective', '反光的；反射的', 'able to reflect light, heat, or ideas', 'Reflective glass can reduce heat.'],
+  ['facade', '立面；外观', 'the outer front or face of a building', 'The facade looked brighter after renovation.'],
+  ['asphalt', '沥青', 'a black material used to make roads', 'Asphalt can store a lot of heat.'],
+  ['pavement', '路面；人行道', 'a hard surface for walking or driving', 'The pavement was still warm at night.'],
+  ['insulation', '隔热；绝缘', 'material or action that reduces heat or sound flow', 'Good insulation keeps rooms cooler.'],
+  ['canopy', '遮篷；树冠', 'a covering that gives shade', 'A canopy can protect people from sun.'],
+  ['corridor', '走廊；通道', 'a long narrow passage or route', 'The corridor stayed crowded at noon.'],
+  ['commuter', '通勤者', 'a person who travels regularly to work or school', 'A commuter waited at the bus stop.'],
+  ['mobility', '流动性；移动能力', 'the ability to move or travel easily', 'Good sidewalks improve mobility.'],
+  ['fairness', '公平；公正', 'the quality of treating people equally and justly', 'Fairness matters in public planning.'],
+  ['governance', '治理；管理', 'the way a place or group is managed', 'Good governance helps cities adapt.'],
+  ['warning', '警告；预警', 'something that tells people about danger', 'The warning arrived before the storm.'],
+  ['forecast', '预测；预报', 'a statement about what is likely to happen', 'The forecast predicted heavy rain.'],
+  ['maintenance', '维护；保养', 'the work needed to keep something in good condition', 'Road maintenance is expensive.'],
+  ['budget', '预算', 'the amount of money planned for a purpose', 'The budget covered new cooling shelters.'],
+  ['electricity', '电力；电', 'a form of energy used for power', 'Electricity demand rose during the heat wave.'],
+  ['energy', '能量；能源', 'power used for work or heat', 'The roof stores energy during the day.'],
+  ['housing', '住房；住房问题', 'homes or the act of providing homes', 'Housing costs are rising quickly.'],
+  ['income', '收入', 'money that a person or group receives', 'Income affects how people handle heat.'],
+  ['traffic', '交通；车流', 'the movement of vehicles on roads', 'Traffic slowed near the school.'],
+  ['pedestrian', '行人', 'a person who is walking', 'Pedestrian routes should stay shaded.'],
+  ['cyclist', '骑自行车的人', 'a person who rides a bicycle', 'The cyclist stopped for water.'],
+  ['vehicle', '车辆', 'a machine used for transport', 'The vehicle waited at the light.'],
+  ['emergency', '紧急情况；突发事件', 'a serious situation that needs quick action', 'The city opened a cooling centre in an emergency.'],
+  ['public', '公共的；公众的', 'for everyone to use or know', 'Public space needs shade.'],
+  ['solar', '太阳的；太阳能的', 'relating to the sun', 'Solar energy can power some systems.'],
+  ['atmosphere', '大气；氛围', 'the layer of gases around the Earth', 'Heat is released into the atmosphere.'],
+  ['surface', '表面', 'the outer layer of something', 'The surface of the road was hot.'],
+  ['water', '水', 'a clear liquid that people, animals, and plants need', 'Water helps plants survive heat.'],
+  ['plant', '植物；种植', 'a living thing that grows in soil and usually has roots and leaves', 'Each plant needs light and water.'],
+  ['leaf', '叶子；叶片', 'a flat green part of a plant', 'A leaf can signal stress very quickly.'],
+  ['seed', '种子', 'a small part of a plant that can grow into a new plant', 'A seed needs water and warmth.'],
+  ['stem', '茎；干', 'the main part of a plant that supports leaves and flowers', 'The stem moves water upward.'],
+  ['branch', '树枝；分支', 'a part that grows from the trunk or stem', 'A branch can shade the ground.'],
+  ['tree', '树', 'a tall plant with a trunk and branches', 'A tree can make a street cooler.'],
+  ['park', '公园；停放', 'a public green space; to leave a vehicle in one place', 'People rested in the park at noon.'],
+  ['sunlight', '阳光', 'light from the sun', 'Sunlight can make a road surface very hot.'],
+  ['street', '街道', 'a road in a town or city', 'The street needs more shade.'],
+  ['route', '路线', 'a way from one place to another', 'A shaded route helps pedestrians.'],
+  ['shelter', '遮蔽物；避难所', 'a place or object that protects people from weather', 'A shelter protects people from direct sun.'],
+  ['coating', '涂层', 'a thin layer put on a surface', 'A light coating can reflect heat.'],
+  ['alert', '警报；提醒', 'a warning that something may happen', 'The alert reached residents quickly.'],
+  ['crisis', '危机', 'a dangerous or difficult time', 'A heat crisis can overwhelm hospitals.'],
+  ['school', '学校', 'a place where children learn', 'Schools may change hours during heat waves.'],
+  ['clinic', '诊所', 'a small medical centre', 'A clinic treated people after the heat alert.'],
+  ['market', '市场', 'a place where goods are bought and sold', 'The market opened earlier on hot days.'],
+  ['delivery', '送货；递送', 'the act of bringing something to a place', 'Delivery workers faced the worst heat.'],
+  ['driver', '司机', 'a person who drives a vehicle', 'The driver took breaks in the shade.'],
+  ['worker', '工人；工作人员', 'a person who does a job', 'Outdoor workers need more protection.'],
+  ['heatwave', '热浪', 'a period of unusually hot weather', 'A heatwave lasted for many days.'],
+  ['combined', '结合的；合并的', 'joined together to make one result', 'Combined action can make cities safer.'],
+  ['trusted', '可信的；受信任的', 'believed to be reliable', 'Trusted local voices improve communication.'],
+  ['education', '教育；宣传', 'the process of teaching and learning', 'Public education helps people prepare.'],
+  ['equity', '公平；公正', 'fairness in the way resources are shared', 'Equity matters in heat planning.'],
+  ['cooler', '更凉爽的；更冷的', 'less hot than something else', 'Shaded streets feel cooler in the afternoon.'],
+  ['roofing', '屋面材料；屋顶覆盖', 'material used to cover a roof', 'Better roofing can reduce indoor heat.'],
+  ['bus', '公交车', 'a large vehicle that carries passengers', 'The bus arrived after the heat alert.'],
+  ['neighbourhood', '街区；社区', 'an area where people live near each other', 'A shaded neighbourhood feels cooler.'],
+  ['science', '科学', 'the study of the natural world through observation and experiment', 'Science helps explain plant responses.'],
+  ['combine', '结合；合并', 'to join two or more things together', 'Planners combine shade and water.'],
+  ['trust', '信任；信赖', 'belief that someone or something is reliable', 'Residents must trust the warning system.'],
+  ['mature', '成熟的；发育良好的', 'fully developed; fully grown', 'Mature trees provide more shade.'],
+  ['discipline', '纪律；自律', 'control of behaviour or training through rules', 'Timekeeping encouraged discipline.'],
+  ['punctuality', '守时；准时', 'the quality of arriving or doing things on time', 'Punctuality became important in cities.'],
+  ['precise', '精确的；准确的', 'exact and clear', 'A precise clock changed navigation.'],
+  ['people', '人们；人们群体', 'humans in general or a group of humans', 'People need better warnings in heat waves.'],
+  ['person', '人；个人', 'a human being', 'Each person needs enough water.'],
+  ['place', '地方；位置', 'a particular area or location', 'The right place can stay cooler.'],
+  ['day', '一天；白天', 'a period of twenty-four hours', 'The day felt much hotter than the night.'],
+  ['life', '生活；生命', 'the state of being alive; the experience of living', 'City life changes when heat rises.'],
+  ['group', '群体；小组', 'a number of people or things together', 'One group studied plant roots.'],
+  ['thing', '东西；事情', 'an object, idea, or matter', 'Time is a difficult thing to measure.'],
+  ['develop', '发展；开发', 'to grow or make something grow or more advanced', 'Cities develop new ways to adapt.'],
+  ['adapt', '适应；调整', 'to change in order to fit new conditions', 'Plants adapt to light and water.'],
+  ['sustain', '维持；支撑', 'to keep something going over time', 'Trees sustain cooler streets.'],
+  ['influence', '影响', 'to affect something or the effect itself', 'Heat can influence health and work.'],
+  ['area', '区域；地区', 'a part of a place', 'This area becomes hotter in the afternoon.'],
+  ['country', '国家；乡村', 'a nation or rural land', 'The country needs better transport systems.'],
+  ['year', '年；一年', 'a period of twelve months', 'Each year brings new weather challenges.'],
+  ['hour', '小时', 'a period of sixty minutes', 'The heat alert lasted for many hours.'],
+  ['second', '秒；第二的', 'a very short unit of time; coming after the first', 'A second can matter in an emergency.'],
+  ['world', '世界', 'the earth and all the people and things on it', 'Cities around the world face heat.'],
+  ['nature', '自然', 'the natural world', 'Nature can help cool a city.'],
+  ['state', '状态；州', 'the condition of something; a political area in some countries', 'The state of the roads affects heat.'],
+  ['part', '部分；角色', 'a piece of something or the role something plays', 'Trees play a part in cooling.'],
+  ['way', '方式；道路', 'a method or direction', 'There is more than one way to adapt.'],
+  ['air', '空气', 'the mixture of gases around us', 'Hot air stayed near the ground.'],
+  ['road', '道路；马路', 'a hard surface for vehicles or walking', 'The road was coated in reflective material.'],
+  ['car', '汽车', 'a road vehicle with four wheels', 'A car offers shade and air conditioning.'],
+  ['warm', '温暖的；热的', 'having a fairly high temperature', 'Warm air stayed in the street at night.'],
+  ['cold', '冷的；寒冷的', 'having a low temperature', 'Cold water helped the plants recover.'],
+  ['dark', '黑暗的；深色的', 'with little light; deep in colour', 'Dark roofs absorb more heat.'],
+  ['new', '新的', 'not old or not used before', 'The city tried a new planning method.'],
+  ['old', '旧的；年老的', 'not new; having lived for many years', 'Old buildings often need more cooling.'],
+  ['near', '靠近；附近的', 'close in space or time', 'A tree near the road gives shade.'],
+  ['far', '远的；很远', 'at a great distance', 'The station was far from the market.'],
+  ['long', '长的；长期的', 'having great length or lasting a long time', 'A long heatwave is hard to manage.'],
+  ['month', '月份；一个月', 'a period of about four weeks', 'The month was marked by heat alerts.'],
+  ['season', '季节', 'a division of the year with similar weather', 'Each season changes the length of the day.'],
+  ['farming', '农业；耕作', 'the work of growing crops or raising animals', 'Farming depended on reliable calendars.'],
+  ['religion', '宗教', 'a system of beliefs and worship', 'Religion and timekeeping often worked together.'],
+  ['field', '田地；领域', 'an open area of land used for farming; a subject or area of work', 'The field was ready for planting.'],
+  ['food', '食物', 'something people or animals eat', 'Food had to be stored before winter.'],
+  ['practice', '实践；做法', 'the actual use of an idea or method; a repeated activity', 'Religious practice often followed the calendar.'],
+  ['belief', '信仰；信念', 'something that a person accepts as true', 'A shared belief shaped the ritual.'],
+  ['winter', '冬天；冬季', 'the coldest season of the year', 'Winter made food storage essential.'],
+  ['spring', '春天', 'the season after winter', 'Spring brought new planting.'],
+  ['summer', '夏天；夏季', 'the warmest season of the year', 'Summer days were long and bright.'],
+  ['autumn', '秋天；秋季', 'the season after summer and before winter', 'Autumn was the harvest season.'],
+  ['major', '主要的；重大的', 'more important or larger than others', 'A major change improved the city.'],
+  ['minor', '较小的；次要的', 'less important or smaller than others', 'A minor delay did not stop the plan.'],
+  ['rapid', '迅速的', 'happening very fast', 'Rapid change can be hard to manage.'],
+  ['gradual', '逐渐的；渐进的', 'happening slowly over time', 'A gradual shift is easier to plan for.'],
+  ['essential', '必要的；基本的', 'very important and needed', 'Shade is essential in hot districts.'],
+  ['simple', '简单的', 'easy to understand or do', 'The simple idea helps readers remember it.'],
+  ['different', '不同的', 'not the same', 'Different cities choose different methods.'],
+  ['same', '相同的', 'not different', 'The same problem appears in many places.'],
+  ['short', '短的；简短的', 'not long', 'A short delay can matter in a heat alert.'],
+  ['first', '第一的；首先的', 'coming before all others', 'The first step is to notice the risk.'],
+  ['last', '最后的；持续', 'coming after all others; to continue for a period', 'The last heatwave lasted for days.'],
+  ['early', '早的；提早的', 'happening before the usual time', 'Early planning saves money later.'],
+  ['late', '晚的；迟到的', 'happening after the usual time', 'Late action can be expensive.'],
+  ['clear', '清楚的；明亮的', 'easy to see, hear, or understand', 'The warning was clear and direct.'],
+  ['whole', '整个的；全部的', 'complete; all of something', 'The whole city felt the heat.'],
+  ['important', '重要的', 'having a lot of value or effect', 'Shade is an important part of heat planning.'],
+  ['useful', '有用的；有益的', 'helpful or able to do a job well', 'A useful warning reaches people early.'],
+  ['similar', '相似的；类似的', 'almost the same', 'Similar cities face similar heat problems.'],
+  ['necessary', '必要的', 'needed for a particular purpose', 'Water is necessary during hot weather.'],
+  ['able', '能够的', 'having the power or skill to do something', 'The city is able to respond faster now.'],
+  ['ability', '能力', 'the power or skill to do something', 'The ability to adapt can save lives.'],
+  ['possible', '可能的', 'able to happen or be done', 'It is possible to cool streets with shade.'],
+  ['possibility', '可能性', 'the chance that something may happen', 'There is a possibility of stronger heat waves.'],
+  ['permission', '允许；许可', 'approval to do something', 'The workers had permission to change the roof.'],
+  ['good', '好的；良好的', 'having the desired quality', 'Good planning makes adaptation easier.'],
+  ['bad', '坏的；不好的', 'of low quality or harmful', 'Bad heat can harm health quickly.'],
+  ['better', '更好的；更好地', 'more good or improved', 'Better roofs can lower indoor heat.'],
+  ['best', '最好的', 'better than all others', 'The best plan combines shade and water.'],
+  ['worse', '更糟的；更差的', 'more bad or less good', 'The weather became worse in the afternoon.'],
+  ['easy', '容易的', 'not difficult', 'It is easy to overlook heat risk.'],
+  ['hard', '困难的；努力的', 'not easy; firm or solid', 'Hard surfaces store heat.'],
+  ['safe', '安全的；放心的', 'not likely to cause harm', 'Safe routes help children walk to school.'],
+  ['safety', '安全；平安', 'the condition of being safe', 'Safety matters during a heat alert.'],
+  ['danger', '危险', 'the possibility of harm or injury', 'Heat can create danger for older people.'],
+  ['dangerous', '危险的', 'likely to cause harm', 'A dangerous street needs more shade.'],
+  ['age', '年龄；时代', 'how old someone or something is; a period in history', 'Age affects how people feel heat.'],
+  ['older', '较年长的；更老的', 'having more age', 'Older residents need more support.'],
+  ['young', '年轻的；幼小的', 'having lived only a short time; not old', 'Young trees need water and care.'],
+  ['care', '照料；关心', 'the act of looking after something or someone', 'Young trees need careful care.'],
+  ['improvement', '改进；提升', 'the act or result of making something better', 'Shaded streets showed clear improvement.'],
+  ['problem', '问题；难题', 'something difficult that needs a solution', 'Heat is a serious problem in cities.'],
+  ['solution', '解决办法；答案', 'something that solves a problem', 'Shade is part of the solution.'],
+  ['issue', '问题；议题', 'an important topic or problem', 'Heat is a public issue.'],
+  ['question', '问题；疑问', 'something that is asked or not yet decided', 'The question is how to adapt fairly.'],
+  ['cost', '花费；成本', 'the amount of money or effort needed', 'The cost of cooling can be high.'],
+  ['money', '钱；金钱', 'coins and banknotes used to buy things', 'Cities spend money on shade and water.'],
+  ['effort', '努力；功夫', 'physical or mental energy used to do something', 'Effort is needed to keep trees alive.'],
+  ['value', '价值；意义', 'the worth of something', 'The value of shade is easy to see.'],
+  ['price', '价格；代价', 'the amount of money needed to buy something', 'The price of energy keeps rising.'],
+  ['high', '高的；高度', 'above the usual level or far up', 'High temperatures can be dangerous.'],
+  ['low', '低的；少的', 'below the usual level', 'Low-income families need support.'],
+  ['higher', '更高的；更大的', 'more high than something else', 'Higher buildings can cast longer shadows.'],
+  ['lower', '更低的；更小的', 'more low than something else', 'Lower costs help more residents.'],
+  ['another', '另一个；再一个', 'one more; a different one', 'Another method can also work.'],
+  ['other', '其他的；别的', 'different or additional', 'Other cities used a similar plan.'],
+  ['through', '穿过；通过', 'from one side to the other or by means of something', 'Water moved through the soil.'],
+  ['under', '在……下面', 'below or beneath something', 'Roots grow under the ground.'],
+  ['over', '在……上方；超过', 'above or across something', 'Trees spread over the street.'],
+  ['around', '围绕；大约', 'surrounding; approximately', 'Trees around the park give shade.'],
+  ['across', '穿过；横跨', 'from one side to the other', 'Sensors measure heat across the city.'],
+  ['against', '反对；靠着', 'in opposition to; touching', 'A wall against the sun can stay cool.'],
+  ['within', '在……之内', 'inside a limit or area', 'Heat can spread within a district.'],
+  ['without', '没有；无', 'not having something', 'Without shade, the street feels hotter.'],
+  ['inside', '在……里面；内部', 'in or into the inner part', 'People stayed inside during the alert.'],
+  ['outside', '在……外面；外部', 'on the outer side', 'Workers stayed outside for a short time.'],
+  ['above', '在……上方；高于', 'higher than something else', 'Temperatures rose above normal.'],
+  ['below', '在……下面；低于', 'lower than something else', 'Night temperatures stayed below the day peak.'],
+  ['nearby', '附近的；在附近', 'not far away', 'A nearby clinic offered shade and water.'],
+  ['one', '一；一个', 'the number 1 or a single thing', 'One city tried a new idea.'],
+  ['two', '二；两个', 'the number 2 or a pair', 'Two streets were redesigned.'],
+  ['three', '三；三个', 'the number 3', 'Three articles are in the library.'],
+  ['four', '四；四个', 'the number 4', 'Four sensors tracked temperature.'],
+  ['five', '五；五个', 'the number 5', 'Five minutes can matter in an alert.'],
+  ['week', '周；星期', 'a period of seven days', 'The warning lasted for a week.'],
+  ['night', '夜晚', 'the time when it is dark outside', 'The road stayed hot at night.'],
+  ['morning', '早晨；上午', 'the early part of the day', 'Morning shade is useful for walkers.'],
+  ['afternoon', '下午', 'the part of the day after noon', 'The afternoon can be the hottest time.'],
+  ['evening', '傍晚；晚上', 'the later part of the day', 'Evening temperatures stayed high.'],
+  ['today', '今天', 'the present day', 'Today the city uses heat warnings.'],
+  ['tomorrow', '明天', 'the day after today', 'Tomorrow may be even hotter.'],
+  ['yesterday', '昨天', 'the day before today', 'Yesterday the park was crowded.'],
+  ['living', '活着的；生活中的', 'alive now; currently in use or happening', 'Living roots send signals.'],
+  ['alive', '活着的', 'not dead', 'The plant stayed alive after the storm.'],
+  ['growing', '生长中的；正在增长的', 'becoming larger or developing now', 'Growing roots search for water.'],
+  ['train', '火车；训练', 'a railway vehicle; to teach or prepare someone', 'The train followed a strict timetable.'],
+  ['regular', '有规律的；定期的', 'happening at fixed times or in a steady way', 'Regular schedules made life easier.'],
+  ['fixed', '固定的；不变的', 'set and not likely to change', 'A fixed time helped the whole town.'],
+  ['length', '长度；时长', 'how long something is', 'The length of the day changes with the season.'],
+  ['however', '然而；不过', 'used to show contrast', 'However, the solution was not simple.'],
+  ['therefore', '因此；所以', 'used to show a result', 'The city cooled streets; therefore, the alert was shorter.'],
+  ['instead', '代替；而不是', 'in place of something else', 'They used shade instead of heavy concrete.'],
+  ['also', '也；同样', 'in addition', 'The plan also improved walking routes.'],
+  ['still', '仍然；依然', 'continuing to happen or remain', 'The road still held heat at night.'],
+  ['only', '仅仅；只有', 'no more than', 'Only a few streets had enough shade.'],
+  ['since', '自从；因为', 'from a time in the past; because', 'Since the policy began, conditions improved.'],
+  ['although', '虽然；尽管', 'used to show contrast', 'Although the design was costly, it worked.'],
+  ['though', '虽然；不过', 'used to show contrast', 'Though expensive, the plan helped residents.'],
+  ['religious', '宗教的', 'relating to religion', 'Religious festivals depended on calendars.'],
+  ['administration', '管理；行政', 'the work of running an organization or system', 'Time helped administration become more orderly.'],
+  ['organization', '组织；安排', 'the way people or things are arranged or managed', 'Organization improved after standard time was introduced.'],
+  ['commercial', '商业的', 'related to buying and selling', 'Commercial travel relied on reliable clocks.'],
+  ['industrialization', '工业化', 'the growth of industry and factories', 'Industrialization increased the need for standard time.'],
+  ['research', '研究', 'careful study to discover new facts', 'Research depends on accurate measurements.'],
+  ['schedule', '日程；时间表', 'a plan of times and events', 'The schedule was built around the clock.'],
+  ['shared', '共享的；共同的', 'used by more than one person or group', 'A shared time system makes travel easier.'],
+  ['household', '家庭；家用的', 'a home or the people living in one', 'Each household received the notice.'],
+  ['invisible', '看不见的；无形的', 'not able to be seen', 'The network is invisible underground.'],
+  ['global', '全球的；世界的', 'relating to the whole world', 'Global time systems need coordination.'],
+  ['economic', '经济的', 'relating to money, business, and trade', 'The change had an economic effect.'],
+  ['imperial', '帝国的；帝王的', 'relating to an empire', 'Imperial trade depended on fast ships.'],
+  ['expansion', '扩张；扩大', 'the process of becoming larger or wider', 'Expansion brought new towns and roads.'],
+  ['instrument', '仪器；工具', 'a tool or device used for a purpose', 'The clock became a scientific instrument.'],
 ];
 
 const EXTRA_DICTIONARY_BASE_ENTRIES = [
@@ -396,21 +715,24 @@ function buildMockDictionary() {
   });
 
   EXTRA_DICTIONARY_BASE_ENTRIES.forEach((item) => {
-    const entry = createDictionaryEntry(item.meaningZh, item.meaningEn, item.example);
-    addDictionaryEntry(dictionary, item.word, entry);
+    const [word, meaningZh, meaningEn, example, partOfSpeech, generateForms = true] = Array.isArray(item)
+      ? item
+      : [item.word, item.meaningZh, item.meaningEn, item.example, item.partOfSpeech, item.generateForms];
+    const entry = createDictionaryEntry(meaningZh, meaningEn, example);
+    addDictionaryEntry(dictionary, word, entry);
 
-    if (item.generateForms === false) {
+    if (generateForms === false) {
       return;
     }
 
-    if (item.partOfSpeech === 'verb') {
-      const forms = getVerbForms(item.word);
+    if (partOfSpeech === 'verb') {
+      const forms = getVerbForms(word);
       Object.values(forms).forEach((form) => addDictionaryEntry(dictionary, form, entry));
       return;
     }
 
-    if (item.partOfSpeech === 'noun') {
-      addDictionaryEntry(dictionary, pluralizeNoun(item.word), entry);
+    if (partOfSpeech === 'noun') {
+      addDictionaryEntry(dictionary, pluralizeNoun(word), entry);
     }
   });
 
@@ -429,6 +751,23 @@ const LEMMA_EXCEPTIONS = new Map([
   ['hotter', 'hot'],
   ['larger', 'large'],
   ['biggest', 'big'],
+  ['fungi', 'fungus'],
+  ['synchronization', 'synchronize'],
+  ['synchronisation', 'synchronize'],
+  ['facades', 'facade'],
+  ['crises', 'crisis'],
+  ['heatwaves', 'heatwave'],
+  ['neighbourhoods', 'neighbourhood'],
+  ['shelters', 'shelter'],
+  ['coatings', 'coating'],
+  ['routes', 'route'],
+  ['schools', 'school'],
+  ['clinics', 'clinic'],
+  ['markets', 'market'],
+  ['drivers', 'driver'],
+  ['workers', 'worker'],
+  ['alerts', 'alert'],
+  ['leaves', 'leaf'],
 ]);
 
 function getDictionaryCandidates(word) {
@@ -1634,6 +1973,52 @@ const ARTICLE_COVERAGE_ENTRIES = [
   ['our', '物主代词，表示我们的', 'a possessive form showing something belongs to us', 'pronoun'],
   ['you', '代词，表示你；你们', 'a pronoun used when speaking to someone', 'pronoun'],
   ['your', '物主代词，表示你的；你们的', 'a possessive form showing something belongs to you', 'pronoun'],
+  ['he', '代词，表示他', 'a pronoun used for a male person', 'pronoun'],
+  ['she', '代词，表示她', 'a pronoun used for a female person', 'pronoun'],
+  ['his', '物主代词，表示他的', 'a possessive form showing something belongs to him', 'pronoun'],
+  ['her', '物主代词，表示她的；她', 'a possessive form showing something belongs to her', 'pronoun'],
+  ['him', '代词，表示他（宾格）', 'an object pronoun used for a male person', 'pronoun'],
+  ['us', '代词，表示我们（宾格）', 'an object pronoun for the speaker and others', 'pronoun'],
+  ['what', '什么；什么样的', 'a word used to ask about things or ideas', 'function'],
+  ['which', '哪一个；哪一些', 'a word used to ask or choose from options', 'function'],
+  ['how', '如何；怎样', 'a word used to ask about manner, method, or degree', 'function'],
+  ['why', '为什么', 'a word used to ask about reasons', 'function'],
+  ['whom', '谁（宾格）', 'a formal word used to ask about an object person', 'function'],
+  ['whose', '谁的', 'a word used to ask about possession', 'function'],
+  ['always', '总是；一直', 'at all times', 'function'],
+  ['often', '经常；常常', 'many times or frequently', 'function'],
+  ['sometimes', '有时；偶尔', 'at some times but not others', 'function'],
+  ['usually', '通常；一般', 'in most cases or on most occasions', 'function'],
+  ['never', '从不；绝不', 'at no time', 'function'],
+  ['culture', '文化', 'the customs, beliefs, and arts of a group of people', 'Culture shapes how people measure time.'],
+  ['cultural', '文化的', 'relating to culture', 'Timekeeping had cultural meaning.'],
+  ['social', '社会的；社交的', 'relating to society or people together', 'Timekeeping has social effects.'],
+  ['political', '政治的', 'relating to government or public affairs', 'A political system may set standard time.'],
+  ['history', '历史', 'the study of past events; the past itself', 'History shows how clocks changed life.'],
+  ['space', '空间；空间领域', 'an open area; the area around the Earth', 'Public space needs shade and water.'],
+  ['open', '打开；开放', 'to make something accessible or not closed', 'The city can open a cooling centre.'],
+  ['close', '关闭；接近', 'to shut something; near to something', 'Close the window when the air is hot.'],
+  ['start', '开始', 'to begin something', 'Start planning before the next heatwave.'],
+  ['stop', '停止；停下', 'to end or pause an action', 'The driver stopped in the shade.'],
+  ['begin', '开始', 'to start or do the first part of something', 'The lesson can begin with the title.'],
+  ['end', '结束；终点', 'the final part of something; to finish', 'The story ends with a warning.'],
+  ['action', '行动；动作', 'something done; the process of doing something', 'Action is needed before the heat grows worse.'],
+  ['event', '事件；活动', 'something that happens', 'The heat alert was an important event for the city.'],
+  ['plan', '计划；方案', 'an idea about what to do', 'The city made a plan for shade.'],
+  ['effect', '效果；影响', 'the result or change caused by something', 'Trees have a cooling effect.'],
+  ['cause', '原因；导致', 'the reason something happens; to make something happen', 'Cars can cause more heat.'],
+  ['reason', '原因；理由', 'why something happens or why something is true', 'The reason is simple: surfaces absorb heat.'],
+  ['analysis', '分析；解析', 'a careful study of something', 'The analysis showed a clear pattern.'],
+  ['conclusion', '结论；结尾', 'a decision or final idea reached after thought', 'The conclusion was practical and fair.'],
+  ['careful', '仔细的；谨慎的', 'paying close attention to avoid mistakes or danger', 'Careful planning prevents mistakes.'],
+  ['carefully', '仔细地；谨慎地', 'with a lot of attention', 'Read the sentence carefully.'],
+  ['fair', '公平的；公正的', 'treating people equally and justly', 'A fair plan helps all residents.'],
+  ['increase', '增加；增长', 'to become greater in size, number, or amount', 'Temperatures increase during the day.'],
+  ['decrease', '减少；降低', 'to become smaller in size, number, or amount', 'Shade can decrease heat on a street.'],
+  ['rise', '上升；升起', 'to move upward or become higher', 'Temperatures rise quickly in the afternoon.'],
+  ['fall', '下降；落下', 'to move downward or become lower', 'Night temperatures fall after sunset.'],
+  ['rising', '上升中的；正在增加的', 'becoming higher or greater now', 'Rising heat is a serious issue.'],
+  ['increasing', '不断增加的；越来越多的', 'becoming greater over time', 'Increasing heat affects many cities.'],
   ['each', '每一个；每个', 'used to talk about every person or thing separately', 'function'],
   ['every', '每一个的；每位的', 'used to talk about all members of a group', 'function'],
   ['all', '全部；所有', 'used to mean the whole amount or number', 'function'],
@@ -1840,7 +2225,7 @@ function extractArticleVocabulary() {
 
   RAW_ARTICLES.forEach((article) => {
     const text = Array.isArray(article.content) ? article.content.join(' ') : String(article.content || '');
-    const matches = text.match(/[A-Za-z]+(?:'[A-Za-z]+)?/g) || [];
+    const matches = text.match(WORD_TOKEN_PATTERN) || [];
 
     matches.forEach((token) => {
       const normalized = normalizeWord(token);
@@ -1871,3 +2256,104 @@ function augmentMockDictionary(dictionary) {
 }
 
 augmentMockDictionary(MOCK_DICTIONARY);
+
+const FUNCTION_WORD_KINDS = {
+  preposition: new Set(['about', 'according', 'after', 'around', 'as', 'at', 'before', 'because', 'by', 'during', 'for', 'from', 'if', 'in', 'inside', 'into', 'instead', 'near', 'of', 'off', 'on', 'outside', 'over', 'since', 'than', 'through', 'to', 'under', 'until', 'up', 'with', 'without', 'within']),
+  conjunction: new Set(['and', 'or', 'but', 'so', 'if', 'because', 'although', 'though', 'while', 'when', 'where', 'why', 'how', 'since', 'then', 'however', 'instead', 'therefore']),
+  pronoun: new Set(['it', 'its', 'we', 'our', 'you', 'your', 'their', 'them', 'they', 'he', 'she', 'his', 'her', 'i', 'me', 'my', 'mine', 'us', 'one', 'another', 'other', 'these', 'those', 'this', 'that', 'who', 'whose', 'what', 'which']),
+  auxiliary: new Set(['can', 'could', 'may', 'might', 'must', 'should', 'will', 'would', 'have', 'has', 'had', 'do', 'does', 'did', 'be', 'is', 'are', 'am', 'was', 'were']),
+  adverb: new Set(['also', 'still', 'only', 'very', 'too', 'just', 'now', 'then', 'here', 'there', 'when', 'where', 'why', 'how', 'however', 'therefore', 'instead', 'quickly', 'slowly', 'closely', 'clearly', 'simply', 'rather', 'especially']),
+};
+
+function buildFallbackCoverageEntry(word) {
+  const normalized = normalizeWord(word);
+
+  if (!normalized) {
+    return null;
+  }
+
+  if (FUNCTION_WORD_KINDS.preposition.has(normalized)) {
+    return createDictionaryEntry(
+      '介词；表示位置、方向或关系',
+      'a preposition that shows relationship, place, or direction',
+      'The article uses "' + normalized + '" to show a relationship between ideas.'
+    );
+  }
+
+  if (FUNCTION_WORD_KINDS.conjunction.has(normalized)) {
+    return createDictionaryEntry(
+      '连词；用于连接句子或子句',
+      'a linking word used to connect clauses or ideas',
+      'The article uses "' + normalized + '" to connect ideas.'
+    );
+  }
+
+  if (FUNCTION_WORD_KINDS.pronoun.has(normalized)) {
+    return createDictionaryEntry(
+      '代词或限定词；用于指代或限定',
+      'a pronoun or determiner used to point to or limit a noun',
+      'The article uses "' + normalized + '" to refer to something already mentioned.'
+    );
+  }
+
+  if (FUNCTION_WORD_KINDS.auxiliary.has(normalized)) {
+    return createDictionaryEntry(
+      '助动词；用于构成时态、语态或语气',
+      'an auxiliary verb used to form tense, voice, or mood',
+      'The article uses "' + normalized + '" to help form a sentence.'
+    );
+  }
+
+  if (FUNCTION_WORD_KINDS.adverb.has(normalized) || /ly$/.test(normalized)) {
+    return createDictionaryEntry(
+      '副词；表示方式、程度或时间',
+      'an adverb that describes how, when, or to what degree',
+      'The article uses "' + normalized + '" to describe how something happens.'
+    );
+  }
+
+  if (/(tion|sion|ment|ness|ity|ship|ance|ence|ure|ism|hood|dom|acy|age)$/i.test(normalized)) {
+    return createDictionaryEntry(
+      '名词；表示概念、状态或结果',
+      'a noun that names an idea, state, or result',
+      'The article uses "' + normalized + '" as an important noun.'
+    );
+  }
+
+  if (/(able|ible|ous|ful|less|ive|al|ic|ary|ant|ent|ish|y)$/i.test(normalized)) {
+    return createDictionaryEntry(
+      '形容词；表示性质或状态',
+      'an adjective that describes a quality or state',
+      'The article uses "' + normalized + '" to describe something in the topic.'
+    );
+  }
+
+  if (/(ing|ed)$/i.test(normalized)) {
+    return createDictionaryEntry(
+      '动词或相关词形；表示动作或变化',
+      'a word form related to an action or change',
+      'The article uses "' + normalized + '" in a way related to action or change.'
+    );
+  }
+
+  return createDictionaryEntry(
+    '常用阅读词；表示文章中的普通概念',
+    'a common reading word used to express a general idea',
+    'The article uses "' + normalized + '" in a reading context.'
+  );
+}
+
+function seedMissingArticleVocabulary(dictionary) {
+  extractArticleVocabulary().forEach((word) => {
+    if (findDictionaryEntry(word)) {
+      return;
+    }
+
+    const entry = buildFallbackCoverageEntry(word);
+    if (entry) {
+      addDictionaryEntry(dictionary, word, entry);
+    }
+  });
+}
+
+seedMissingArticleVocabulary(MOCK_DICTIONARY);

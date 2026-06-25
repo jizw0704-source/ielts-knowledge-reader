@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'ielts-knowledge-reader.vocab.v1';
+﻿const STORAGE_KEY = 'ielts-knowledge-reader.vocab.v1';
 const ALLOWED_FAMILIARITY = ['陌生', '认识', '掌握'];
 
 function normalizeWord(value) {
@@ -207,6 +207,29 @@ const RAW_ARTICLES = [
     ],
     coreWords: ['ancient', 'observe', 'measure', 'device', 'civilization', 'innovation', 'mechanism', 'urban', 'network', 'communication', 'architecture', 'predict', 'variation', 'complex', 'climate'],
     publishDate: '2026-06-25',
+  },
+  {
+    id: 'the-science-of-sleep-and-memory',
+    title: 'The Science of Sleep and Memory',
+    subtitle: 'Why sleep helps the brain stabilize learning, regulate attention, and prepare for future study.',
+    sourceType: 'Original IELTS-style Article',
+    difficulty: 'IELTS 6.5–7.0',
+    tags: ['Biology', 'Learning', 'Psychology'],
+    summaryZh: '睡眠并不是停止思考的被动状态，而是大脑整理信息、巩固记忆、调节注意力并为下一轮学习做准备的重要过程。文章讨论睡眠阶段、记忆巩固、神经可塑性以及睡眠不足对学习表现的影响。',
+    summaryEn: 'Sleep is an active biological process that helps the brain consolidate memories, support learning, regulate attention, and maintain the plasticity needed for future study.',
+    content: [
+      `For many years, sleep was treated as a quiet biological necessity rather than an active part of learning. People knew they felt tired after a poor night, yet the deeper relationship between sleep and memory was not always obvious. Modern research has changed that view. Scientists now describe sleep as a period in which the brain continues to work on information gathered during the day. Instead of simply shutting down, the brain reorganizes recent experiences and strengthens useful connections. This process is one reason students often remember material more clearly after rest than they do immediately after study.`,
+      `Memory itself is not a single ability. Researchers usually divide it into several forms, including short-term memory, working memory, and long-term memory. Working memory helps a person hold and manipulate information for a brief period, such as remembering a number while solving a problem. Long-term memory stores information for much longer, sometimes for years. Learning becomes more stable when new material moves from a temporary system into a more durable one. Sleep appears to support that transition. It does not create knowledge without effort, but it helps the brain preserve and organize what was first encoded while a person was awake.`,
+      `One explanation involves the structure of sleep itself. A normal night includes repeated cycles with different stages, including light sleep, deep sleep, and rapid eye movement sleep. These stages do not perform identical tasks. Deep sleep is often associated with the stabilization of factual knowledge, such as vocabulary or concepts learned in class. Rapid eye movement sleep is more closely linked to emotional processing, creativity, and the integration of information across separate experiences. Because the brain moves through these stages several times, a full night of sleep may provide multiple opportunities for different kinds of memory work to take place.`,
+      `A key concept in this field is consolidation. When people first learn something, the memory trace is fragile. New information, distraction, or stress can weaken it before it becomes reliable. During sleep, however, neural patterns related to recent learning may be replayed and strengthened. Some researchers compare this to editing a rough draft. The original material already exists, but it is reorganized into a more efficient structure. The brain appears selective, giving priority to information that is emotionally important or repeatedly practiced. Sleep therefore supports memory quality, not just memory quantity.`,
+      `Attention is also part of the story. A student who sleeps badly may still attend class, yet the ability to focus, compare ideas, and resist distraction often declines. This matters because learning starts before consolidation begins. If attention is weak during study, the brain has less useful material to process later at night. In that sense, sleep helps learning at two stages: first by preparing the mind to notice and encode information, and later by helping preserve it. Chronic sleep loss often reduces accuracy, slows decision-making, and increases simple errors.`,
+      `The biological explanation for these effects is closely tied to brain plasticity. Plasticity refers to the brain’s capacity to change through experience by adjusting the strength of synaptic connections. Learning requires this flexibility, but the system must also remain balanced. If every connection grew stronger all the time, the brain would become noisy and inefficient. Sleep may help solve this problem by supporting selective strengthening while also allowing broader recovery across neural networks. In simple terms, the brain becomes ready to learn because it has spent part of the night refining what was learned before. Without that reset, future learning may become slower and less precise.`,
+      `Sleep deprivation shows what happens when this system is disrupted. Experiments have found that people who are kept awake after learning new material often perform worse on later tests than those who sleep normally. They may forget details, confuse similar ideas, or struggle to apply knowledge in a new context. Long-term lack of sleep is also associated with mood problems, lower motivation, and reduced self-control, all of which can influence academic performance. These effects appear in students and adults alike.`,
+      `These findings have practical consequences for education. Many learners assume that the best strategy is to extend study time by sleeping less, especially before an exam. Yet this approach can reduce the value of the extra hours gained. A shorter revision session followed by adequate sleep may produce better results than a longer session completed in a state of exhaustion. Educators increasingly recognize that learning also depends on habits that support healthy brain function. Regular sleep schedules, reduced late-night screen exposure, and well-timed review may all improve the conditions under which memory becomes lasting knowledge.`,
+      `The science of sleep and memory therefore suggests that learning is not confined to the classroom, the desk, or the moment of practice. Part of education continues in darkness, when the sleeping brain quietly selects, stabilizes, and links information across time. Sleep does not replace effort, curiosity, or repetition, but it makes those investments more effective. As research on memory, attention, and plasticity becomes more detailed, one message remains consistent: rest is not the opposite of learning. It is one of the biological foundations that allows learning to endure.`,
+    ],
+    coreWords: ['memory', 'learning', 'attention', 'consolidation', 'plasticity', 'sleep', 'neural', 'encode', 'retain', 'cognitive', 'focus', 'fatigue', 'process', 'structure', 'recovery'],
+    publishDate: '2026-06-30',
   },
 ];
 

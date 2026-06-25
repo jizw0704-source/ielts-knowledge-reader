@@ -148,3 +148,31 @@ IELTS Knowledge Reader 是面向雅思阅读能力提升的英文知识阅读器
 
 - 如果文章数据或生词数据结构变化，先更新本文件，再同步更新实现代码
 - 如果新增页面视图，保持底部导航行为一致
+
+## Codex Controlled Patch Development Rules
+
+1. Start with read-only locating before editing any file.
+2. During read-only locating, list:
+   - planned files;
+   - planned functions or data sections;
+   - prohibited areas;
+   - risks;
+   - minimal patch plan.
+3. Every task must clearly state the allowed edit scope and the forbidden scope.
+4. If `node --check`, tests, or build fail, stop immediately and report the error line and message; do not widen the fix scope.
+5. After changes, check `git diff` before UI or functional verification.
+6. If `git diff` contains forbidden areas, revert first instead of patching around the problem.
+7. Do only one small goal per round; do not change articles, dictionary, UI, storage, entry files, and project rules at the same time.
+8. Temporary scripts must be cleaned up and must not remain in the project tree or system temp directories.
+9. Before commit, confirm `git status` only contains expected files.
+10. Without confirmation, do not change:
+    - `index.html` resource references;
+    - global `style.css` rules;
+    - `localStorage` keys;
+    - `mockDictionary` / `DICTIONARY_ENTRIES`;
+    - word lookup regexes;
+    - article `content`;
+    - `summaryZh` / `summaryEn`;
+    - project rule files.
+11. Important milestones must update `docs/PROJECT_MEMORY.md`.
+12. If encoding noise, corruption, syntax pollution, or cross-area accidental edits appear, prefer rolling back to the latest stable commit instead of continuing to patch.

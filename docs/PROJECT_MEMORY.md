@@ -109,3 +109,12 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 - 每次修改前都先确认规则文档。
 - 每次提交前都先确认只包含预期文件。
 - 如果需要修改视觉、缓存或资源引用，优先做小范围、可回退的变更。
+
+## 13. V0.3.0 Guardrail Record
+
+- The first V0.3.0 scheduled-content attempt failed.
+- The failure was caused by an over-broad `script.js` edit that accidentally touched `summaryZh`, `mockDictionary`, and the word-lookup logic, and it also caused `node --check` to fail.
+- The failed diff was backed up to `Y:\codex\v030-scheduled-content-broken.diff`.
+- `script.js` has been rolled back and the repository is back to a clean state.
+- The team will now use a safer workflow: read-only locating -> minimal patch -> diff review -> functional verification -> commit.
+- Future V0.3.0 work must restart from the clean baseline.

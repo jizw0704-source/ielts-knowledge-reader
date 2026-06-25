@@ -124,6 +124,23 @@ function toLocalDateKey(date = new Date()) {
   return `${year}-${month}-${day}`;
 }
 
+function getTodayDateString() {
+  return toLocalDateKey();
+}
+
+function isArticlePublished(article, today = getTodayDateString()) {
+  if (!article || !article.publishDate) {
+    return true;
+  }
+
+  return String(today) >= String(article.publishDate);
+}
+
+function getPublishedArticles(today = getTodayDateString()) {
+  return ARTICLES.filter((article) => isArticlePublished(article, today)).sort((a, b) => String(b.publishDate || '').localeCompare(String(a.publishDate || '')));
+}
+
+
 const RAW_ARTICLES = [
   {
     id: 'the-hidden-intelligence-of-plants',
@@ -145,7 +162,7 @@ const RAW_ARTICLES = [
       `For that reason, the hidden intelligence of plants is not merely a poetic phrase. It is a reminder that life can solve problems in more than one way. Humans rely on brains and language, but plants rely on distributed sensing, chemical exchange, and slow yet effective adaptation. Their responses may be invisible at first, yet they shape survival on every scale, from the life of a single seed to the stability of an entire landscape. The more carefully scientists study those responses, the more clearly they see that intelligence is not always loud, fast, or human. Sometimes it is rooted in silence, spread through soil, and expressed in the patience of growth.`,
     ],
     coreWords: ['adaptation', 'mechanism', 'evidence', 'species', 'communication', 'environment', 'sustainable', 'predict', 'resource', 'variation', 'biodiversity', 'resilience', 'strategy', 'innovation', 'climate'],
-    publishDate: '2026-06-15',
+    publishDate: '2026-06-24',
   },
   {
     id: 'how-cities-adapt-to-extreme-heat',
@@ -167,7 +184,7 @@ const RAW_ARTICLES = [
       `In the end, adapting to extreme heat is not a single project but a long-term process of design and governance. No city can solve the problem with one material, one law, or one device. A sustainable response usually mixes reflective surfaces, shade, transport planning, emergency alerts, and maintenance budgets that can support the system year after year. Just as importantly, adaptation must remain flexible, because future heat waves may be longer, sharper, and more unpredictable than the last. Cities that begin early can reduce medical costs and protect vulnerable residents, but only if they treat heat as a permanent urban condition rather than a seasonal inconvenience.`,
     ],
     coreWords: ['urban', 'infrastructure', 'temperature', 'measure', 'environment', 'sustainable', 'predict', 'resource', 'resilience', 'phenomenon', 'strategy', 'innovation', 'climate', 'architecture', 'network', 'communication'],
-    publishDate: '2026-06-10',
+    publishDate: '2026-06-23',
   },
   {
     id: 'the-history-of-timekeeping',
@@ -189,7 +206,7 @@ const RAW_ARTICLES = [
       `The history of timekeeping shows that measuring time has always served two purposes at once. It is a scientific activity because it asks how nature can be observed and controlled more precisely. It is also a social activity because time organizes labour, religion, transport, trade, and public life. Every new device, from the sundial to the atomic clock, has made time more exact, but it has also made society more dependent on shared schedules. That is why timekeeping remains one of the most important technologies humans have created. It tells us when to act, but it also tells us how modern life is connected.`,
     ],
     coreWords: ['ancient', 'observe', 'measure', 'device', 'civilization', 'innovation', 'mechanism', 'urban', 'network', 'communication', 'architecture', 'predict', 'variation', 'complex', 'climate'],
-    publishDate: '2026-05-28',
+    publishDate: '2026-06-25',
   },
 ];
 
@@ -1247,15 +1264,13 @@ function renderReaderView() {
   dom.readingTimer.textContent = formatDuration(state.timerSeconds);
 }
 
-function getTodayArticle() {
-  const today = new Date();
-  const startOfYear = new Date(today.getFullYear(), 0, 0);
-  const dayOfYear = Math.floor((today - startOfYear) / 86400000);
-  return ARTICLES[dayOfYear % ARTICLES.length];
+function getTodayArticle(today = getTodayDateString()) {
+  const publishedArticles = getPublishedArticles(today);
+  return publishedArticles.find((article) => article.publishDate === today) || publishedArticles[0] || null;
 }
 
 function getFilteredArticles() {
-  const sorted = [...ARTICLES].sort((a, b) => b.publishDate.localeCompare(a.publishDate));
+  const sorted = getPublishedArticles();
   if (state.activeTag === '全部') {
     return sorted;
   }
@@ -1426,6 +1441,14 @@ function openArticle(articleId, originView = state.navView) {
   const article = ARTICLE_MAP.get(articleId);
   if (!article) {
     showToast('未找到文章');
+    return;
+  }
+
+  if (!isArticlePublished(article)) {
+    state.activeArticleId = null;
+    state.returnView = originView || 'today';
+    state.navView = originView || 'today';
+    showView('today');
     return;
   }
 

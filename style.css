@@ -866,3 +866,75 @@ kbd {
   border-color: var(--brand);
   box-shadow: 0 0 0 3px var(--brand-soft);
 }
+
+body.has-quote-splash {
+  overflow: hidden;
+}
+
+.quote-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(env(safe-area-inset-top) + 1rem) 1rem calc(env(safe-area-inset-bottom) + 1rem);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(149, 202, 0, 0.28), transparent 24%),
+    radial-gradient(circle at 82% 18%, rgba(255, 255, 255, 0.42), transparent 22%),
+    radial-gradient(circle at 75% 80%, rgba(149, 202, 0, 0.16), transparent 28%),
+    radial-gradient(circle at 12% 84%, rgba(255, 255, 255, 0.3), transparent 24%),
+    linear-gradient(155deg, #eaf3d4 0%, #f8fbf0 36%, #dbe9b8 70%, #f8faf2 100%);
+}
+
+.quote-splash::before,
+.quote-splash::after {
+  content: '';
+  position: absolute;
+  inset: auto;
+  border-radius: 999px;
+  pointer-events: none;
+  filter: blur(28px);
+  opacity: 0.92;
+}
+
+.quote-splash::before {
+  width: 22rem;
+  height: 22rem;
+  left: -5rem;
+  top: -4rem;
+  background: radial-gradient(circle, rgba(149, 202, 0, 0.42) 0%, rgba(149, 202, 0, 0.08) 56%, transparent 72%);
+}
+
+.quote-splash::after {
+  width: 18rem;
+  height: 18rem;
+  right: -4rem;
+  bottom: -3rem;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.68) 0%, rgba(149, 202, 0, 0.08) 48%, transparent 70%);
+}
+
+.quote-splash-panel {
+  width: min(560px, 100%);
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  box-shadow: var(--shadow-strong);
+}
+
+.quote-splash-quote {
+  margin: 0.35rem 0 0.65rem;
+  color: var(--text-strong);
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+.quote-splash-panel .card-note {
+  margin-inline: auto;
+  max-width: 34rem;
+}
+
+.quote-splash-actions {
+  justify-content: center;
+}

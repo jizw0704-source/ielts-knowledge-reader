@@ -118,6 +118,8 @@ function formatEstimatedReadingTime(minutes) {
 }
 
 const PRODUCT_DESCRIPTION = '每天一篇原创 IELTS-style 英文知识阅读，支持点词释义、生词本、阅读记录和读后感。';
+const QUOTE_SPLASH_QUOTE = 'Learning begins when attention becomes quiet.';
+const QUOTE_SPLASH_DELAY_MS = 10000;
 
 function toLocalDateKey(date = new Date()) {
   const year = date.getFullYear();
@@ -1047,12 +1049,17 @@ const state = {
   currentWordContext: null,
   timerSeconds: 0,
   timerId: null,
+  quoteSplashEl: null,
+  quoteSplashTimerId: null,
 };
 
 const dom = {};
 
 document.addEventListener('DOMContentLoaded', init);
-window.addEventListener('beforeunload', stopReadingTimer);
+window.addEventListener('beforeunload', () => {
+  stopReadingTimer();
+  clearQuoteSplashTimer();
+});
 
 function init() {
   cacheDom();
@@ -1061,6 +1068,7 @@ function init() {
   bindEvents();
   renderAllViews();
   showView('today');
+  showQuoteSplash();
 }
 
 function cacheDom() {
@@ -1165,6 +1173,54 @@ function showView(view) {
   } else if (view === 'reader') {
     dom.readerView.scrollIntoView({ block: 'start' });
   }
+}
+
+function clearQuoteSplashTimer() {
+  if (state.quoteSplashTimerId) {
+    window.clearTimeout(state.quoteSplashTimerId);
+    state.quoteSplashTimerId = null;
+  }
+}
+
+function hideQuoteSplash() {
+  clearQuoteSplashTimer();
+  document.body.classList.remove('has-quote-splash');
+
+  if (state.quoteSplashEl) {
+    state.quoteSplashEl.remove();
+    state.quoteSplashEl = null;
+  }
+}
+
+function hideQuoteSplashAndShowToday() {
+  hideQuoteSplash();
+  showView('today');
+}
+
+function showQuoteSplash() {
+  hideQuoteSplash();
+
+  const splash = document.createElement('section');
+  splash.className = 'quote-splash';
+  splash.setAttribute('role', 'dialog');
+  splash.setAttribute('aria-modal', 'true');
+  splash.innerHTML = `
+    <div class="hero-card quote-splash-panel">
+      <p class="section-kicker">IELTS Knowledge Reader</p>
+      <h1 class="quote-splash-quote">${escapeHtml(QUOTE_SPLASH_QUOTE)}</h1>
+      <p class="card-note">${escapeHtml(PRODUCT_DESCRIPTION)}</p>
+      <p class="card-note">约 10 秒后自动进入今日推荐，也可以直接 Skip。</p>
+      <div class="cta-row quote-splash-actions">
+        <button class="primary-button" type="button" data-action="skip-quote-splash">Skip</button>
+      </div>
+    </div>
+  `;
+  splash.addEventListener('click', handleViewAction);
+
+  document.body.appendChild(splash);
+  document.body.classList.add('has-quote-splash');
+  state.quoteSplashEl = splash;
+  state.quoteSplashTimerId = window.setTimeout(hideQuoteSplashAndShowToday, QUOTE_SPLASH_DELAY_MS);
 }
 
 function updateTopbar(view) {
@@ -1653,6 +1709,11 @@ function handleViewAction(event) {
 
   if (action === 'open-article' && articleId) {
     openArticle(articleId, state.currentView === 'reader' ? state.navView : state.currentView);
+    return;
+  }
+
+  if (action === 'skip-quote-splash') {
+    hideQuoteSplashAndShowToday();
     return;
   }
 

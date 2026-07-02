@@ -256,3 +256,9 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 * &#x20; - V0.3.6 可继续做 Download Poster + QR；
 * &#x20; - 欢迎页视觉可复用为海报模板。
 
+## V0.3 Phase Review Record
+
+* 已新增 `docs/PHASE_REVIEW_V0.3.md`，用于记录 IELTS Knowledge Reader V0.3 阶段复盘。
+* V0.3 阶段重点完成每日文章闭环、分享入口、Quote Splash 欢迎页和部署入口验证。
+* V0.3.6 Download Poster + QR 暂缓，后续在核心体验稳定后再推进。
+

@@ -6,7 +6,7 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 
 ## 2\. 当前部署与仓库
 
-* 本地目录：`Y:\\\\\\\\\\\\\\\\codex\\\\\\\\\\\\\\\\ielts-knowledge-reader`
+* 本地目录：`Y:\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\codex\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ielts-knowledge-reader`
 * GitHub 仓库：[https://github.com/jizw0704-source/ielts-knowledge-reader.git](https://github.com/jizw0704-source/ielts-knowledge-reader.git)
 * GitHub Pages 地址：[https://jizw0704-source.github.io/ielts-knowledge-reader/](https://jizw0704-source.github.io/ielts-knowledge-reader/)
 * 当前线上 `main` 已保持稳定版本，开发分支不自动合并 `main`
@@ -41,7 +41,7 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 3. 后续如需更新静态资源引用，要非常谨慎，优先小范围验证。
 4. 之前颜色系统修改曾导致按钮和弹窗交互异常。
 5. 后续 UI 修改必须小步进行。
-6. 不要使用宽泛 CSS 选择器，例如 `\\\\\\\\\\\\\\\[class\\\\\\\\\\\\\\\*="modal"]`。
+6. 不要使用宽泛 CSS 选择器，例如 `\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\[class\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*="modal"]`。
 7. Codex 临时检查文件不得留在项目外或纳入提交。
 8. 每次提交前必须确认 `git status` 只包含预期文件。
 
@@ -55,17 +55,17 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 
 ## 7\. 每轮开发前必读文件
 
-1. `Y:\\\\\\\\\\\\\\\\codex\\\\\\\\\\\\\\\\AGENTS.md`
+1. `Y:\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\codex\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\AGENTS.md`
 2. `AGENTS.md`
-3. `docs/PROJECT\\\\\\\\\\\\\\\_RULES.md`
-4. `docs/REGRESSION\\\\\\\\\\\\\\\_CHECKLIST.md`
-5. `docs/ARTICLE\\\\\\\\\\\\\\\_SPEC.md`
-6. `docs/PROJECT\\\\\\\\\\\\\\\_MEMORY.md`
+3. `docs/PROJECT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_RULES.md`
+4. `docs/REGRESSION\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_CHECKLIST.md`
+5. `docs/ARTICLE\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_SPEC.md`
+6. `docs/PROJECT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_MEMORY.md`
 7. `README.md`
 
 ## 8\. 更新规则
 
-* `PROJECT\\\\\\\\\\\\\\\_MEMORY.md` 只在重要节点更新。
+* `PROJECT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_MEMORY.md` 只在重要节点更新。
 * 不记录无意义流水账。
 * 不记录隐私信息、账号密码、API Key。
 * 每次完成重要版本、踩坑或改变路线时再更新。
@@ -115,7 +115,7 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 
 * The first V0.3.0 scheduled-content attempt failed.
 * The failure was caused by an over-broad `script.js` edit that accidentally touched `summaryZh`, `mockDictionary`, and the word-lookup logic, and it also caused `node --check` to fail.
-* The failed diff was backed up to `Y:\\\\\\\\\\\\\\\\codex\\\\\\\\\\\\\\\\v030-scheduled-content-broken.diff`.
+* The failed diff was backed up to `Y:\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\codex\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\v030-scheduled-content-broken.diff`.
 * `script.js` has been rolled back and the repository is back to a clean state.
 * The team will now use a safer workflow: read-only locating -> minimal patch -> diff review -> functional verification -> commit.
 * Future V0.3.0 work must restart from the clean baseline.
@@ -177,4 +177,27 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 * &#x20; - 继续新增 2026-06-27 每日文章；
 * &#x20; - 稳定数日后再推进 articles.js 文章数据拆分；
 * &#x20; - 后续再接入 AI 自动生成草稿与人工审核发布流程。
+* \## V0.3.3 Share Entry and Product Intro
+* 
+* \- V0.3.3 已完成分享入口与新用户引导的最小版本。
+* \- commit: b71be21 Add share message entry and product intro。
+* \- 本轮功能：
+* &#x20; - 首页新增一句产品说明；
+* &#x20; - 阅读页新增“复制分享语”按钮；
+* &#x20; - 新增分享语生成与复制逻辑；
+* &#x20; - 复制逻辑包含 navigator.clipboard.writeText 和 textarea fallback；
+* &#x20; - 新增 copy-share-message action 分支。
+* \- 本轮只修改 script.js。
+* \- 未修改文章正文。
+* \- 未修改 RAW\_ARTICLES。
+* \- 未修改 mockDictionary / DICTIONARY\_ENTRIES。
+* \- 未修改点词、生词本、阅读记录、localStorage key。
+* \- 未修改 publishDate / getPublishedArticles / getTodayArticle。
+* \- 未修改 index.html、style.css、README.md。
+* \- node --check 通过。
+* \- 本地验收重点：
+* &#x20; - 首页能看到产品说明；
+* &#x20; - 阅读页能看到“复制分享语”按钮；
+* &#x20; - 复制内容包含文章标题、产品说明和当前链接；
+* &#x20; - 点词、生词本、完成阅读、读后感均不受影响。
 

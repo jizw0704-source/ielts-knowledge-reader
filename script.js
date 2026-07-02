@@ -117,6 +117,8 @@ function formatEstimatedReadingTime(minutes) {
   return `建议阅读 ${Number(minutes) || 0} 分钟`;
 }
 
+const PRODUCT_DESCRIPTION = '每天一篇原创 IELTS-style 英文知识阅读，支持点词释义、生词本、阅读记录和读后感。';
+
 function toLocalDateKey(date = new Date()) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -1118,6 +1120,7 @@ function renderTodayView() {
       </div>
     </div>
     <p class="hero-subtitle">${escapeHtml(article.subtitle)}</p>
+    <p class="card-note">${escapeHtml(PRODUCT_DESCRIPTION)}</p>
     <div class="meta-chips">
       <span class="meta-chip">${escapeHtml(formatWordCount(article.wordCount))}</span>
       <span class="meta-chip">${escapeHtml(formatEstimatedReadingTime(article.estimatedMinutes))}</span>
@@ -1421,6 +1424,7 @@ function renderReadingCompletionBlock(article, record) {
       </div>
       <div class="cta-row">
         <button class="primary-button" type="button" data-action="complete-reading" data-article-id="${escapeAttr(article.id)}">完成阅读</button>
+        <button class="secondary-button" type="button" data-action="copy-share-message" data-article-id="${escapeAttr(article.id)}">复制分享语</button>
         <span class="card-note">会记录完成时间、阅读时长和文章统计</span>
       </div>
       <div class="reflection-panel${completed ? '' : ' is-hidden'}">
@@ -1877,6 +1881,54 @@ function showToast(message) {
   }, 1800);
 }
 
+function buildShareMessage(article) {
+  const link = window.location.href;
+  return [
+    `我今天读了一篇 IELTS-style 英文知识文章：《${article.title}》。`,
+    '',
+    `这是一个${PRODUCT_DESCRIPTION}`,
+    '',
+    '你也可以体验一下：',
+    link,
+    '',
+    '欢迎一起来读。',
+  ].join('\n');
+}
+
+function copyTextToClipboard(text) {
+  if (navigator.clipboard?.writeText) {
+    return navigator.clipboard.writeText(text).then(() => true).catch(() => false);
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.left = '-9999px';
+  textarea.style.top = '0';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+
+  let copied = false;
+  try {
+    copied = document.execCommand('copy');
+  } catch (error) {
+    copied = false;
+  }
+
+  document.body.removeChild(textarea);
+  return Promise.resolve(copied);
+}
+
+function copyShareMessage(article) {
+  const message = buildShareMessage(article);
+  copyTextToClipboard(message).then((copied) => {
+    showToast(copied ? '分享语已复制' : '复制失败，请手动分享当前页面');
+  });
+}
+
 function handleReaderClickActionV2(event) {
   const actionButton = event.target.closest('[data-action]');
   if (!actionButton) {
@@ -1920,6 +1972,18 @@ function handleReaderClickActionV2(event) {
     dom.definitionSentence.textContent = sentence || '暂无原文句子';
     dom.saveWordButton.textContent = existingVocabularyItem ? '更新到生词本' : '加入生词本';
     dom.definitionModal.classList.remove('is-hidden');
+    return;
+  }
+
+  if (action === 'copy-share-message') {
+    const articleId = actionButton.dataset.articleId;
+    const article = ARTICLE_MAP.get(articleId) || getCurrentReadingArticle();
+    if (!article) {
+      showToast('暂无可复制的分享语');
+      return;
+    }
+
+    copyShareMessage(article);
     return;
   }
 

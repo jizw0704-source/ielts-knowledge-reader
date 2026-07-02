@@ -6,7 +6,7 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 
 ## 2\. 当前部署与仓库
 
-* 本地目录：`Y:\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\codex\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ielts-knowledge-reader`
+* 本地目录：`Y:\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\codex\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ielts-knowledge-reader`
 * GitHub 仓库：[https://github.com/jizw0704-source/ielts-knowledge-reader.git](https://github.com/jizw0704-source/ielts-knowledge-reader.git)
 * GitHub Pages 地址：[https://jizw0704-source.github.io/ielts-knowledge-reader/](https://jizw0704-source.github.io/ielts-knowledge-reader/)
 * 当前线上 `main` 已保持稳定版本，开发分支不自动合并 `main`
@@ -41,7 +41,7 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 3. 后续如需更新静态资源引用，要非常谨慎，优先小范围验证。
 4. 之前颜色系统修改曾导致按钮和弹窗交互异常。
 5. 后续 UI 修改必须小步进行。
-6. 不要使用宽泛 CSS 选择器，例如 `\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\[class\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*="modal"]`。
+6. 不要使用宽泛 CSS 选择器，例如 `\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\[class\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*="modal"]`。
 7. Codex 临时检查文件不得留在项目外或纳入提交。
 8. 每次提交前必须确认 `git status` 只包含预期文件。
 
@@ -55,17 +55,17 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 
 ## 7\. 每轮开发前必读文件
 
-1. `Y:\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\codex\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\AGENTS.md`
+1. `Y:\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\codex\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\AGENTS.md`
 2. `AGENTS.md`
-3. `docs/PROJECT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_RULES.md`
-4. `docs/REGRESSION\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_CHECKLIST.md`
-5. `docs/ARTICLE\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_SPEC.md`
-6. `docs/PROJECT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_MEMORY.md`
+3. `docs/PROJECT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_RULES.md`
+4. `docs/REGRESSION\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_CHECKLIST.md`
+5. `docs/ARTICLE\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_SPEC.md`
+6. `docs/PROJECT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_MEMORY.md`
 7. `README.md`
 
 ## 8\. 更新规则
 
-* `PROJECT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_MEMORY.md` 只在重要节点更新。
+* `PROJECT\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\_MEMORY.md` 只在重要节点更新。
 * 不记录无意义流水账。
 * 不记录隐私信息、账号密码、API Key。
 * 每次完成重要版本、踩坑或改变路线时再更新。
@@ -115,7 +115,7 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 
 * The first V0.3.0 scheduled-content attempt failed.
 * The failure was caused by an over-broad `script.js` edit that accidentally touched `summaryZh`, `mockDictionary`, and the word-lookup logic, and it also caused `node --check` to fail.
-* The failed diff was backed up to `Y:\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\codex\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\v030-scheduled-content-broken.diff`.
+* The failed diff was backed up to `Y:\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\codex\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\v030-scheduled-content-broken.diff`.
 * `script.js` has been rolled back and the repository is back to a clean state.
 * The team will now use a safer workflow: read-only locating -> minimal patch -> diff review -> functional verification -> commit.
 * Future V0.3.0 work must restart from the clean baseline.
@@ -200,4 +200,28 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 * &#x20; - 阅读页能看到“复制分享语”按钮；
 * &#x20; - 复制内容包含文章标题、产品说明和当前链接；
 * &#x20; - 点词、生词本、完成阅读、读后感均不受影响。
+* \## V0.3.4 Daily Articles Backfill
+* 
+* \- V0.3.4 已完成 2026-06-27 至 2026-07-02 每日文章补齐。
+* \- commit: 9a5291b Backfill daily IELTS-style articles through July 2。
+* \- 本轮只修改 script.js。
+* \- 本轮只在 RAW\_ARTICLES 尾部新增 5 篇原创 IELTS-style 文章。
+* \- 新增文章：
+* &#x20; - 2026-06-27: How Public Libraries Are Changing in the Digital Age
+* &#x20; - 2026-06-28: Why Fungi Matter to Life on Earth
+* &#x20; - 2026-06-29: How Sensors Changed Modern Farming
+* &#x20; - 2026-07-01: The Hidden Cost of Urban Noise
+* &#x20; - 2026-07-02: Why Cities Need Quiet Places
+* \- 当前文章日期已从 2026-06-25 连续覆盖至 2026-07-02，中间包含 2026-06-30 的 The Science of Sleep and Memory。
+* \- 未修改已有文章正文和排序。
+* \- 未修改 mockDictionary / DICTIONARY\_ENTRIES。
+* \- 未修改点词、生词本、阅读记录、localStorage key。
+* \- 未修改 publishDate / getPublishedArticles / getTodayArticle。
+* \- 未修改 V0.3.3 首页产品说明和复制分享语逻辑。
+* \- node --check 通过。
+* \- 本地验收重点：
+* &#x20; - 首页显示 2026-07-02 的 Why Cities Need Quiet Places；
+* &#x20; - 文章库能看到 2026-06-27 至 2026-07-02 已发布文章；
+* &#x20; - 新增文章可进入阅读页；
+* &#x20; - 点词、生词本、完成阅读、读后感、复制分享语均正常。
 

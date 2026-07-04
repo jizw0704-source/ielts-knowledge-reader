@@ -1026,6 +1026,79 @@ function findDictionaryEntry(word) {
   return null;
 }
 
+function normalizePhraseForLookup(value) {
+  return String(value || '')
+    .match(WORD_TOKEN_PATTERN)
+    ?.map((part) => normalizeWord(part))
+    .filter(Boolean)
+    .join(' ') || '';
+}
+
+function getArticleContextVocabulary(articleId) {
+  return ARTICLE_CONTEXT_VOCABULARY[articleId] || [];
+}
+
+function lookupWordWithContext(articleId, word, sentence) {
+  const articleVocabulary = getArticleContextVocabulary(articleId);
+  const normalizedWord = normalizeWord(word);
+  const wordCandidates = [normalizedWord, ...getDictionaryCandidates(word)].filter(Boolean);
+  const candidateSet = new Set(wordCandidates);
+  const normalizedSentence = normalizePhraseForLookup(sentence);
+
+  const phraseMatch = articleVocabulary
+    .filter((entry) => entry.type === 'phrase')
+    .map((entry) => ({
+      ...entry,
+      normalizedTerm: normalizePhraseForLookup(entry.term),
+    }))
+    .filter((entry) => entry.normalizedTerm && normalizedSentence.includes(entry.normalizedTerm))
+    .filter((entry) => entry.normalizedTerm.split(' ').some((token) => candidateSet.has(token)))
+    .sort((left, right) => right.normalizedTerm.split(' ').length - left.normalizedTerm.split(' ').length)[0];
+
+  if (phraseMatch) {
+    return {
+      matchedWord: phraseMatch.term,
+      source: 'context',
+      entry: createDictionaryEntry(phraseMatch.definitionZh, phraseMatch.definitionEn, phraseMatch.example),
+    };
+  }
+
+  const wordMatch = articleVocabulary.find((entry) => {
+    if (entry.type === 'phrase') {
+      return false;
+    }
+
+    const normalizedTerm = normalizeWord(entry.term);
+    if (!normalizedTerm) {
+      return false;
+    }
+
+    if (candidateSet.has(normalizedTerm)) {
+      return true;
+    }
+
+    return getDictionaryCandidates(entry.term).some((candidate) => candidateSet.has(candidate));
+  });
+
+  if (wordMatch) {
+    return {
+      matchedWord: wordMatch.term,
+      source: 'context',
+      entry: createDictionaryEntry(wordMatch.definitionZh, wordMatch.definitionEn, wordMatch.example),
+    };
+  }
+
+  const globalMatch = findDictionaryEntry(word);
+  if (globalMatch) {
+    return {
+      ...globalMatch,
+      source: 'global',
+    };
+  }
+
+  return null;
+}
+
 const MOCK_DICTIONARY = buildMockDictionary();
 
 const ARTICLES = RAW_ARTICLES.map((article) => ({
@@ -1036,6 +1109,186 @@ const ARTICLES = RAW_ARTICLES.map((article) => ({
 }));
 
 const ARTICLE_MAP = new Map(ARTICLES.map((article) => [article.id, article]));
+
+const ARTICLE_CONTEXT_VOCABULARY = {
+  'why-cities-need-quiet-places': [
+    {
+      term: 'quiet places',
+      type: 'phrase',
+      definitionZh: '安静场所；本文中指能帮助人们恢复注意力、降低压力的城市空间，例如公园、图书馆和安静步道。',
+      definitionEn: 'Urban spaces that reduce noise and help people recover attention, such as parks, libraries, and calm paths.',
+      example: 'In this article, quiet places are treated as public infrastructure rather than luxury spaces.',
+    },
+    {
+      term: 'public libraries',
+      type: 'phrase',
+      definitionZh: '公共图书馆；为公众提供阅读、自习和安静空间的机构。',
+      definitionEn: 'Public institutions that provide reading, study, and quiet access for everyone.',
+      example: 'Public libraries give many residents a place to read without extra cost.',
+    },
+    {
+      term: 'quiet study room',
+      type: 'phrase',
+      definitionZh: '安静自习室；用于专注学习、远离干扰的室内空间。',
+      definitionEn: 'A quiet indoor space designed for focused reading and study.',
+      example: 'A quiet study room can help students work without constant interruption.',
+    },
+    {
+      term: 'parks and green spaces',
+      type: 'phrase',
+      definitionZh: '公园和绿地；能缓解声音、提供休息并帮助人们恢复精力的城市绿色区域。',
+      definitionEn: 'Urban green areas that soften sound, offer rest, and support recovery.',
+      example: 'Parks and green spaces can make a busy city feel less demanding.',
+    },
+    {
+      term: 'public space',
+      type: 'phrase',
+      definitionZh: '公共空间；任何可供公众使用、停留和交流的城市区域。',
+      definitionEn: 'Any urban area open for public use, rest, or interaction.',
+      example: 'A good public space should feel open, safe, and usable.',
+    },
+    {
+      term: 'calm public environments',
+      type: 'phrase',
+      definitionZh: '平静的公共环境；声音较少、刺激较弱、便于放松的公共场所氛围。',
+      definitionEn: 'Public settings with low stimulation that help people relax and think.',
+      example: 'Calm public environments make everyday recovery easier.',
+    },
+    {
+      term: 'network of calm',
+      type: 'phrase',
+      definitionZh: '安静网络；分布在城市中的多个安静地点形成的连续休息系统。',
+      definitionEn: 'A connected pattern of quiet locations spread across a city.',
+      example: 'A network of calm gives residents more than one place to recover attention.',
+    },
+    {
+      term: 'daily recovery',
+      type: 'phrase',
+      definitionZh: '日常恢复；通过安静环境和休息每天恢复精力与注意力的过程。',
+      definitionEn: 'The everyday process of regaining energy and attention through rest.',
+      example: 'Daily recovery can be as important as work or study time.',
+    },
+    {
+      term: 'building layouts',
+      type: 'phrase',
+      definitionZh: '建筑布局；建筑、庭院和入口的空间安排，会影响噪音、遮挡和安静程度。',
+      definitionEn: 'The arrangement of buildings and open areas that shapes noise and calm.',
+      example: 'Building layouts can protect courtyards from traffic noise.',
+    },
+    {
+      term: 'traffic management',
+      type: 'phrase',
+      definitionZh: '交通管理；通过限速、路线和组织方式控制车流与噪音。',
+      definitionEn: 'The control of vehicle flow through rules, routes, and road design.',
+      example: 'Traffic management can make a neighbourhood more suitable for walking.',
+    },
+    {
+      term: 'smaller spaces',
+      type: 'phrase',
+      definitionZh: '小型空间；分布在社区中的较小安静地点，便于日常使用。',
+      definitionEn: 'Smaller quiet locations within a neighbourhood that are easy to reach.',
+      example: 'Smaller spaces can still support concentration if they are well designed.',
+    },
+    {
+      term: 'noisy city',
+      type: 'phrase',
+      definitionZh: '嘈杂城市；声音过多、让人难以恢复注意力的城市环境。',
+      definitionEn: 'An urban environment with too much sound for easy rest or focus.',
+      example: 'A noisy city can make calm daily routines difficult to maintain.',
+    },
+    {
+      term: 'mental health',
+      type: 'phrase',
+      definitionZh: '心理健康；情绪稳定、压力可控、心理恢复良好的状态。',
+      definitionEn: "A person's emotional and psychological well-being.",
+      example: 'Quiet places can support mental health by reducing constant pressure.',
+    },
+    {
+      term: 'attention',
+      type: 'word',
+      definitionZh: '注意力；把 ذهن focused 在一件事上的能力。',
+      definitionEn: 'The ability to focus on one thing and ignore distractions.',
+      example: 'Attention is easier to keep in a quiet room.',
+    },
+    {
+      term: 'concentration',
+      type: 'word',
+      definitionZh: '专注力；持续把注意力放在阅读或思考上的能力。',
+      definitionEn: 'The ability to keep your mind on a task for a period of time.',
+      example: 'Concentration improves when the background is less demanding.',
+    },
+    {
+      term: 'recovery',
+      type: 'word',
+      definitionZh: '恢复；从疲劳或压力中重新获得精力与平静。',
+      definitionEn: 'The process of regaining energy, balance, or calm after strain.',
+      example: 'Recovery is easier when people can rest in calm surroundings.',
+    },
+    {
+      term: 'traffic',
+      type: 'word',
+      definitionZh: '交通；文章中指车辆流动及其带来的声音和压力。',
+      definitionEn: 'Vehicles moving on roads, along with the sound and pressure they create.',
+      example: 'Traffic can stop a quiet street from feeling restful.',
+    },
+    {
+      term: 'libraries',
+      type: 'word',
+      definitionZh: '图书馆；提供阅读、自习和安静空间的公共机构。',
+      definitionEn: 'Public institutions that provide reading, study, and quiet space.',
+      example: 'Libraries give city residents access to quiet study without paying for a room.',
+    },
+    {
+      term: 'parks',
+      type: 'word',
+      definitionZh: '公园；可散步、休息并获得相对安静的公共绿色空间。',
+      definitionEn: 'Public green spaces where people can walk, rest, and breathe more easily.',
+      example: 'Parks offer a break from streets full of sound.',
+    },
+    {
+      term: 'restore',
+      type: 'word',
+      definitionZh: '恢复；使注意力、精力或平静重新回来。',
+      definitionEn: 'To bring back energy, calm, or attention after it has been reduced.',
+      example: 'A short pause can restore attention after a noisy commute.',
+    },
+    {
+      term: 'quiet',
+      type: 'word',
+      definitionZh: '安静的；声音少、刺激弱、容易专注的。',
+      definitionEn: 'Having little noise or stimulation; easy for focus.',
+      example: 'Quiet spaces can help people think more clearly.',
+    },
+    {
+      term: 'calm',
+      type: 'word',
+      definitionZh: '平静的；让人不那么紧张或警觉的。',
+      definitionEn: 'Peaceful, relaxed, and not highly stimulating.',
+      example: 'A calm room makes it easier to read for a long time.',
+    },
+    {
+      term: 'safe',
+      type: 'word',
+      definitionZh: '安全的；不会让人感到危险或不安的。',
+      definitionEn: 'Not likely to cause harm or fear.',
+      example: 'A safe quiet place is one that people can use without worry.',
+    },
+    {
+      term: 'welcoming',
+      type: 'word',
+      definitionZh: '友好的；让不同人愿意进入和停留的。',
+      definitionEn: 'Friendly and easy for different people to enter and use.',
+      example: 'A welcoming library invites people to stay and read.',
+    },
+    {
+      term: 'planning',
+      type: 'word',
+      definitionZh: '规划；安排城市空间、交通和公共资源的过程。',
+      definitionEn: 'The process of organizing city space, transport, and public resources.',
+      example: 'Planning decides where quiet places can work best.',
+    },
+  ],
+};
 
 const state = {
   currentView: 'today',
@@ -2118,7 +2371,7 @@ function handleReaderClickActionV2(event) {
       return;
     }
 
-    const lookupResult = findDictionaryEntry(word);
+    const lookupResult = lookupWordWithContext(article.id, word, sentence);
     const dictionaryEntry = lookupResult?.entry || null;
     const matchedWord = lookupResult?.matchedWord || normalizeWord(word);
     const normalizedWord = normalizeWord(word);
@@ -2136,7 +2389,9 @@ function handleReaderClickActionV2(event) {
 
     dom.definitionWord.textContent = word;
     dom.definitionLookupHint.textContent = dictionaryEntry
-      ? `查询词：${word}；匹配词：${matchedWord}。${existingVocabularyItem ? '该词已在生词本中，可继续更新记录。' : '已命中内置 mockDictionary。'}`
+      ? (lookupResult?.source === 'context'
+        ? `查询词：${word}；语境词：${matchedWord}。已命中当前文章语境释义。`
+        : `查询词：${word}；匹配词：${matchedWord}。${existingVocabularyItem ? '该词已在生词本中，可继续更新记录。' : '已命中内置 mockDictionary。'}`)
       : `查询词：${word}；暂未收录该词。可先加入生词本，后续可补充释义。生词本中会保存原词、来源文章、来源句子。`;
     dom.definitionZh.textContent = dictionaryEntry?.meaningZh || '暂未收录该词，可先加入生词本';
     dom.definitionEn.textContent = dictionaryEntry?.meaningEn || 'This word is not yet included in the built-in mock dictionary.';

@@ -286,3 +286,10 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 * &#x20; - 后续可考虑将文章数据和文章词汇包拆分到独立文件；
 * &#x20; - 暂不接外部 API，继续保持静态部署稳定性。
 
+
+## V0.4.1 IELTS Source Style Guide
+
+* 已新增 `docs/IELTS_SOURCE_STYLE_GUIDE.md`。
+* 该文档用于规范后续每日文章的来源风格、选题标准、版权边界和 `references` 字段。
+* 后续每日文章应从“随机 AI 生成”升级为“参考 IELTS 真题来源风格的原创模拟文章”。
+* 本轮只修改 docs，不修改业务代码、不新增文章。

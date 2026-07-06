@@ -82,6 +82,10 @@ IELTS Academic Reading 的材料常见来源包括 books, journals, magazines, n
 
 ## 7. 后续文章生成流程建议
 
+新文章应优先遵循 `docs/CONTENT_PIPELINE.md`。参考来源用于启发主题、事实点、结构和术语，不用于复制、翻译或近似改写。
+
+每篇新文章建议使用 2–4 个参考来源，并保持原创 IELTS-style 表达。
+
 1. 先确定主题；
 2. 搜集 2–4 个参考来源；
 3. 提炼事实点和结构；

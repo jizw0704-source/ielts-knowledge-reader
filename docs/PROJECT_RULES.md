@@ -149,6 +149,16 @@ IELTS Knowledge Reader 是面向雅思阅读能力提升的英文知识阅读器
 - 如果文章数据或生词数据结构变化，先更新本文件，再同步更新实现代码
 - 如果新增页面视图，保持底部导航行为一致
 
+## V0.5.0 内容架构规则
+
+1. 数据拆分任务必须分阶段进行。
+2. 不允许一次性同时拆 `RAW_ARTICLES`、`ARTICLE_CONTEXT_VOCABULARY` 和 `references`。
+3. 每次拆分必须保留单独 commit 作为回滚点。
+4. 拆分前后必须测试今日推荐、文章库、阅读页、点词、生词本、完成阅读、读后感、Quote Splash、复制分享语。
+5. 新增文章时不得伪造 `references`。
+6. 涉及中文内容时必须做 UTF-8 检查。
+7. 工作区不干净时必须停止。
+
 ## Codex Controlled Patch Development Rules
 
 1. Start with read-only locating before editing any file.

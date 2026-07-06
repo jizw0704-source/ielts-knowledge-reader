@@ -338,3 +338,17 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 * &#x20; - 生词本、完成阅读、读后感、Quote Splash、今日推荐、文章库等功能正常。
 * \- V0.4 语境词汇机制已扩展到第三篇文章，具备继续批量扩展的基础。
 
+
+## V0.5.0-a Content Architecture Documentation
+
+* 已启动 V0.5.0 Source-backed Content Architecture。
+* 本阶段只做文档与内容流水线定义。
+* 已新增 `docs/CONTENT_PIPELINE.md`。
+* 已在 `docs/ARTICLE_SPEC.md` 中定义 `references` 字段。
+* 已在 `docs/IELTS_SOURCE_STYLE_GUIDE.md` 中补充 source-backed article 流程。
+* 已在 `docs/PROJECT_RULES.md` 中补充内容架构拆分规则。
+* 本阶段未修改业务代码。
+* 后续建议：
+  * V0.5.0-b：拆分 `ARTICLE_CONTEXT_VOCABULARY` 到 `context-vocabulary.js`；
+  * V0.5.0-c：拆分 `RAW_ARTICLES` 到 `articles.js`；
+  * V0.5.0-d：用一篇新文章验证 source-backed pipeline。

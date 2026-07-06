@@ -62,6 +62,28 @@ IELTS Knowledge Reader 的内置文章不是 IELTS / Cambridge IELTS 真题原�
 - optional: sourceNote
 - optional: relatedTopics
 
+### references 字段
+
+`references` 是后续新文章的推荐字段。旧文章可以缺省，不强制回填。
+
+新文章应优先包含 `references`，用于记录参考来源：
+
+```js
+references: [
+  {
+    title: '',
+    source: '',
+    url: '',
+    usage: ''
+  }
+]
+```
+
+- 不允许伪造来源；
+- 不允许为了补全字段而给旧文章添加不真实来源；
+- `references` 只说明参考来源，不代表文章转载、翻译或改写；
+- 具体内容流程应遵守 `docs/CONTENT_PIPELINE.md`。
+
 ## 6. 版权边界
 
 禁止：

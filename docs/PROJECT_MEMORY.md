@@ -519,3 +519,20 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 
 \- V0.5.0 的 source-backed content pipeline 已完成从数据结构到页面展示的闭环。
 
+## V0.5.0 Phase Review
+
+- 已完成 V0.5.0 Source-backed Content Architecture 阶段复盘。
+- 已新增 `docs/PHASE_REVIEW_V0.5.md`。
+- V0.5.0 已完成：
+  - 内容流水线文档；
+  - `context-vocabulary.js` 拆分；
+  - `articles.js` 拆分；
+  - 第一篇 source-backed 文章；
+  - references 阅读页展示。
+- 当前项目进入更稳定的三层结构：
+  - `articles.js`：文章数据；
+  - `context-vocabulary.js`：语境词汇；
+  - `script.js`：主逻辑。
+- 下一阶段建议推进 V0.6.0 Hybrid Dictionary System，重点解决点词释义覆盖率和智能度问题。
+- 本阶段只修改 docs，不修改业务代码。
+

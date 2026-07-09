@@ -836,6 +836,73 @@ kbd {
   gap: 0.75rem;
 }
 
+.article-references {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin: 1rem 0;
+}
+
+.references-note {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.reference-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.reference-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  overflow-wrap: anywhere;
+}
+
+.reference-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.reference-title {
+  margin: 0;
+  color: var(--text-strong);
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.reference-source {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.reference-usage {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.reference-link {
+  align-self: flex-start;
+  color: var(--brand-dark);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.reference-link:focus-visible,
+.reference-link:hover {
+  text-decoration: underline;
+}
+
 .reflection-panel {
   display: flex;
   flex-direction: column;

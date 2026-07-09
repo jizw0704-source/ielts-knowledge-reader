@@ -1326,9 +1326,49 @@ function renderReaderView() {
   dom.readerContent.innerHTML = article.content
     .map((paragraph) => `<p class="reading-paragraph">${renderParagraph(paragraph, article)}</p>`)
     .join('')
+    + renderArticleReferences(article)
     + renderReadingCompletionBlock(article, readingRecord);
 
   dom.readingTimer.textContent = formatDuration(state.timerSeconds);
+}
+
+function renderArticleReferences(article) {
+  const references = Array.isArray(article.references)
+    ? article.references.filter((reference) => reference && typeof reference === 'object')
+    : [];
+
+  if (!references.length) {
+    return '';
+  }
+
+  return `
+    <section class="summary-block article-references" aria-label="Article references">
+      <div>
+        <p class="summary-title">Sources and References</p>
+        <p class="card-note references-note">These sources informed the topic, background, or terminology. The article is original and not a translation or close paraphrase.</p>
+      </div>
+      <div class="reference-list">
+        ${references
+          .map((reference) => {
+            const title = String(reference.title || 'Untitled reference');
+            const source = String(reference.source || 'Unknown source');
+            const usage = String(reference.usage || 'Used as background reference.');
+            const url = String(reference.url || '').trim();
+            return `
+              <article class="reference-item">
+                <div class="reference-head">
+                  <h3 class="reference-title">${escapeHtml(title)}</h3>
+                  <span class="reference-source">${escapeHtml(source)}</span>
+                </div>
+                <p class="reference-usage">${escapeHtml(usage)}</p>
+                ${url ? `<a class="reference-link" href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer">Open source</a>` : ''}
+              </article>
+            `;
+          })
+          .join('')}
+      </div>
+    </section>
+  `;
 }
 
 function getTodayArticle(today = getTodayDateString()) {

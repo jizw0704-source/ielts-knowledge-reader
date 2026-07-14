@@ -814,6 +814,16 @@ function getArticleContextVocabulary(articleId) {
   return ARTICLE_CONTEXT_VOCABULARY[articleId] || [];
 }
 
+function createLookupResult({ entry = null, matchedWord, sourceType, sourceLabel, isFallback = false }) {
+  return {
+    entry,
+    matchedWord,
+    sourceType,
+    sourceLabel,
+    isFallback,
+  };
+}
+
 function lookupWordWithContext(articleId, word, sentence) {
   const articleVocabulary = getArticleContextVocabulary(articleId);
   const normalizedWord = normalizeWord(word);
@@ -832,11 +842,12 @@ function lookupWordWithContext(articleId, word, sentence) {
     .sort((left, right) => right.normalizedTerm.split(' ').length - left.normalizedTerm.split(' ').length)[0];
 
   if (phraseMatch) {
-    return {
-      matchedWord: phraseMatch.term,
-      source: 'context',
+    return createLookupResult({
       entry: createDictionaryEntry(phraseMatch.definitionZh, phraseMatch.definitionEn, phraseMatch.example),
-    };
+      matchedWord: phraseMatch.term,
+      sourceType: 'article-context-phrase',
+      sourceLabel: 'Article context',
+    });
   }
 
   const wordMatch = articleVocabulary.find((entry) => {
@@ -857,22 +868,30 @@ function lookupWordWithContext(articleId, word, sentence) {
   });
 
   if (wordMatch) {
-    return {
-      matchedWord: wordMatch.term,
-      source: 'context',
+    return createLookupResult({
       entry: createDictionaryEntry(wordMatch.definitionZh, wordMatch.definitionEn, wordMatch.example),
-    };
+      matchedWord: wordMatch.term,
+      sourceType: 'article-context-word',
+      sourceLabel: 'Article context',
+    });
   }
 
   const globalMatch = findDictionaryEntry(word);
   if (globalMatch) {
-    return {
-      ...globalMatch,
-      source: 'global',
-    };
+    return createLookupResult({
+      entry: globalMatch.entry,
+      matchedWord: globalMatch.matchedWord,
+      sourceType: 'local-dictionary',
+      sourceLabel: 'Local dictionary',
+    });
   }
 
-  return null;
+  return createLookupResult({
+    matchedWord: normalizedWord || word,
+    sourceType: 'fallback',
+    sourceLabel: 'Not found',
+    isFallback: true,
+  });
 }
 
 const MOCK_DICTIONARY = buildMockDictionary();
@@ -2010,8 +2029,8 @@ function handleReaderClickActionV2(event) {
     }
 
     const lookupResult = lookupWordWithContext(article.id, word, sentence);
-    const dictionaryEntry = lookupResult?.entry || null;
-    const matchedWord = lookupResult?.matchedWord || normalizeWord(word);
+    const dictionaryEntry = lookupResult.entry;
+    const matchedWord = lookupResult.matchedWord || normalizeWord(word);
     const normalizedWord = normalizeWord(word);
     const existingVocabularyItem = state.vocabulary.find((item) => item.word === normalizedWord);
 
@@ -2027,7 +2046,7 @@ function handleReaderClickActionV2(event) {
 
     dom.definitionWord.textContent = word;
     dom.definitionLookupHint.textContent = dictionaryEntry
-      ? (lookupResult?.source === 'context'
+      ? (lookupResult.sourceType === 'article-context-phrase' || lookupResult.sourceType === 'article-context-word'
         ? `查询词：${word}；语境词：${matchedWord}。已命中当前文章语境释义。`
         : `查询词：${word}；匹配词：${matchedWord}。${existingVocabularyItem ? '该词已在生词本中，可继续更新记录。' : '已命中内置 mockDictionary。'}`)
       : `查询词：${word}；暂未收录该词。可先加入生词本，后续可补充释义。生词本中会保存原词、来源文章、来源句子。`;

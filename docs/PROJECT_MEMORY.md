@@ -536,3 +536,25 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 - 下一阶段建议推进 V0.6.0 Hybrid Dictionary System，重点解决点词释义覆盖率和智能度问题。
 - 本阶段只修改 docs，不修改业务代码。
 
+## V0.6.0-b Normalize Lookup Result
+
+- V0.6.0-b 已完成并合并到 `main`。
+- 本阶段只标准化 `lookupWordWithContext()` 的返回结构，为后续 Hybrid Dictionary System 打基础。
+- 新增 `createLookupResult()` helper。
+- `lookupWordWithContext()` 现在统一返回：
+  - `entry`
+  - `matchedWord`
+  - `sourceType`
+  - `sourceLabel`
+  - `isFallback`
+- 当前 `sourceType` 包括：
+  - `article-context-phrase`
+  - `article-context-word`
+  - `local-dictionary`
+  - `fallback`
+- 本阶段保持查词优先级不变：article context phrase -> article context word -> local dictionary -> fallback。
+- 本阶段未修改词典数据、文章数据、点词弹窗 HTML 结构、生词本保存 schema、localStorage key、Quote Splash、复制分享语、阅读记录和发布逻辑。
+- `node --check articles.js`、`node --check context-vocabulary.js`、`node --check script.js` 均通过。
+- 本地页面验收通过。
+- 后续建议进入 V0.6.0-c：拆分 base dictionary，或先做 lookup sourceType 的轻量 UI 展示。
+

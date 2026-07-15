@@ -558,3 +558,31 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 - 本地页面验收通过。
 - 后续建议进入 V0.6.0-c：拆分 base dictionary，或先做 lookup sourceType 的轻量 UI 展示。
 
+## V0.6.0-c Split Base Dictionary Data
+
+- V0.6.0-c 已完成 base dictionary 静态数据拆分。
+- 新增 base-dictionary.js。
+- 已将 DICTIONARY_ENTRIES 从 script.js 迁移到 base-dictionary.js，并通过 window.DICTIONARY_ENTRIES 挂载。
+- 已将 EXTRA_DICTIONARY_BASE_ENTRIES 从 script.js 迁移到 base-dictionary.js，并通过 window.EXTRA_DICTIONARY_BASE_ENTRIES 挂载。
+- index.html 已在 script.js 之前加载 base-dictionary.js。
+- buildMockDictionary() 仍保留在 script.js。
+- MOCK_DICTIONARY 生成逻辑保持不变。
+- lookupWordWithContext()、createLookupResult()、词形还原、点词弹窗、生词本、阅读记录、Quote Splash、复制分享语、localStorage key 均未改动。
+- node --check articles.js、context-vocabulary.js、base-dictionary.js、script.js 均通过。
+- 本地验收通过：
+  - Quote Splash 正常；
+  - 今日推荐正常；
+  - 文章库正常；
+  - 阅读页正常；
+  - article context vocabulary 命中正常；
+  - local dictionary 命中正常；
+  - 词形变化命中正常；
+  - 未收录词 fallback 和加入生词本正常；
+  - 生词本、完成阅读、读后感、复制分享语、References 正常。
+- 当前结构进一步清晰：
+  - articles.js：文章数据；
+  - context-vocabulary.js：文章语境词汇；
+  - base-dictionary.js：基础词典静态数据；
+  - script.js：主交互和查词构建逻辑。
+- 后续建议推进 V0.6.0-d：优化 fallback message，让未收录词提示更清晰。
+

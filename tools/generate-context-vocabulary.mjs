@@ -5,8 +5,17 @@ import { fileURLToPath } from 'node:url';
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(SCRIPT_DIR, '..');
-const DEFAULT_API_URL = 'https://api.minimaxi.com/v1/chat/completions';
+const DEFAULT_BASE_URL = 'https://api.minimaxi.com/v1';
 const DEFAULT_MODEL = 'MiniMax-M3';
+
+function getApiUrl() {
+  if (process.env.MINIMAX_API_URL) {
+    return process.env.MINIMAX_API_URL;
+  }
+
+  const baseUrl = process.env.MINIMAX_BASE_URL || DEFAULT_BASE_URL;
+  return `${baseUrl.replace(/\/+$/, '')}/chat/completions`;
+}
 
 function getArgument(name) {
   const index = process.argv.indexOf(name);
@@ -20,7 +29,8 @@ function showHelp() {
 Environment variables:
   MINIMAX_API_KEY   Required for a real API call. Never commit this value.
   MINIMAX_MODEL     Optional. Defaults to ${DEFAULT_MODEL}.
-  MINIMAX_API_URL   Optional. Defaults to ${DEFAULT_API_URL}.
+  MINIMAX_BASE_URL  Optional OpenAI-compatible base URL. Defaults to ${DEFAULT_BASE_URL}.
+  MINIMAX_API_URL   Optional full chat-completions URL. Overrides MINIMAX_BASE_URL.
 
 Examples:
   node tools/generate-context-vocabulary.mjs --article-id how-public-libraries-are-changing-in-the-digital-age --dry-run
@@ -133,7 +143,7 @@ function findContextWarnings(entries, article) {
 async function requestVocabulary(prompt) {
   const apiKey = process.env.MINIMAX_API_KEY;
   const model = process.env.MINIMAX_MODEL || DEFAULT_MODEL;
-  const apiUrl = process.env.MINIMAX_API_URL || DEFAULT_API_URL;
+  const apiUrl = getApiUrl();
 
   if (!apiKey) {
     throw new Error('MINIMAX_API_KEY is not set. Set it in the current shell and do not save it in the repository.');
@@ -210,6 +220,7 @@ async function main() {
   if (process.argv.includes('--dry-run')) {
     console.log(`Dry run passed for ${article.id}.`);
     console.log(`Model: ${process.env.MINIMAX_MODEL || DEFAULT_MODEL}`);
+    console.log(`API URL: ${getApiUrl()}`);
     console.log(`Prompt characters: ${prompt.length}`);
     console.log(`Draft output: ${outputPath}`);
     console.log('No API request was sent.');

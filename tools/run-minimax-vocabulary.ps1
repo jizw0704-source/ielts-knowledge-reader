@@ -5,7 +5,7 @@ param(
 
     [string]$ArticleId = 'how-public-libraries-are-changing-in-the-digital-age',
 
-    [string]$BaseUrl = 'https://api.minimax.io/v1',
+    [string]$BaseUrl = 'https://api.minimaxi.com/v1',
 
     [string]$Model = 'MiniMax-M3'
 )

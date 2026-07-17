@@ -586,3 +586,18 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
   - script.js：主交互和查词构建逻辑。
 - 后续建议推进 V0.6.0-d：优化 fallback message，让未收录词提示更清晰。
 
+## V0.7.0-a MiniMax Context Vocabulary Pipeline Docs
+
+- V0.7.0-a 已开始 MiniMax-assisted vocabulary pipeline。
+- 本阶段目标是使用 MiniMax API 辅助生成文章级语境词汇包，而不是直接在前端实时调用 AI。
+- 已新增 `docs/MINIMAX_CONTEXT_VOCABULARY_PIPELINE.md`。
+- 已新增 `prompts/context-vocabulary-generation.md`。
+- 已在 `docs/PROJECT_RULES.md` 中补充 AI 辅助内容生成和密钥安全规则。
+- 明确安全规则：MiniMax API Key 不进入前端、不进入仓库、不进入文档、不进入 Prompt 模板。
+- 当前推荐路线：
+  - 先用 MiniMax 预生成 `context-vocabulary.js` 词汇包草稿；
+  - 人工审核后再写入正式数据；
+  - 用户点词时继续使用本地静态数据；
+  - 后续如需实时 AI 点词，必须通过后端代理或 Serverless Function。
+- 本轮只修改 docs 和 prompts，不修改业务代码，也不调用 MiniMax API。
+

@@ -1,0 +1,9 @@
+# Local API credentials
+.env
+.env.*
+!.env.example
+.secrets*
+*.secret
+
+# AI-generated drafts require human review before commit
+generated/

@@ -25,9 +25,9 @@
 8. `definitionZh` 必须解释该词在本文语境中的含义，而不只是普通词典释义。
 9. `definitionEn` 使用简洁自然的英文解释。
 10. `example` 使用原创、自然、便于学习的英文例句，不要复制文章长句。
-11. 输出必须是可粘贴到 `context-vocabulary.js` 的 JavaScript 数组格式。
+11. 输出必须是严格 JSON 数组，使用双引号且不要使用尾随逗号；该 JSON 同时应可作为 JavaScript 数组粘贴到 `context-vocabulary.js`。
 12. 不要使用 Markdown 表格。
-13. 不要输出分析过程、说明、标题或数组以外的文字。
+13. 不要输出分析过程、说明、标题、Markdown 代码围栏或数组以外的文字。
 14. 不要虚构文章没有提供的来源、数据或研究结论。
 
 ## Input
@@ -54,14 +54,14 @@ REFERENCES:
 
 ## Output Example
 
-```js
+```json
 [
   {
-    term: 'sponge city',
-    type: 'phrase',
-    definitionZh: '海绵城市；本文中指通过绿地、湿地和透水铺装等方式吸收、储存并管理雨水的城市规划理念。',
-    definitionEn: 'An urban planning approach that uses natural and permeable surfaces to absorb, store, and manage rainwater.',
-    example: 'A sponge city can reduce flood risk by slowing rainwater before it reaches drainage systems.',
-  },
+    "term": "sponge city",
+    "type": "phrase",
+    "definitionZh": "海绵城市；本文中指通过绿地、湿地和透水铺装等方式吸收、储存并管理雨水的城市规划理念。",
+    "definitionEn": "An urban planning approach that uses natural and permeable surfaces to absorb, store, and manage rainwater.",
+    "example": "A sponge city can reduce flood risk by slowing rainwater before it reaches drainage systems."
+  }
 ]
 ```

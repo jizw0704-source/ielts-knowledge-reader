@@ -186,3 +186,16 @@ IELTS Knowledge Reader 是面向雅思阅读能力提升的英文知识阅读器
     - project rule files.
 11. Important milestones must update `docs/PROJECT_MEMORY.md`.
 12. If encoding noise, corruption, syntax pollution, or cross-area accidental edits appear, prefer rolling back to the latest stable commit instead of continuing to patch.
+
+## V0.7.0 AI-assisted Content Generation Rules
+
+1. Client-side and GitHub Pages code must not call AI APIs directly.
+2. API keys must not appear in frontend files, tracked files, documentation, prompts, `localStorage`, or Git history.
+3. Development-time AI generation may be performed only by a local script that reads its key from an environment variable, or by an approved server-side proxy.
+4. Before adding a local AI script, add appropriate secret and generated-draft patterns to `.gitignore`.
+5. AI output is always a draft and must receive human review before it changes `articles.js`, `context-vocabulary.js`, or `base-dictionary.js`.
+6. AI generation must not fabricate references, research findings, statistics, or source attribution.
+7. A generation script must write to a separate draft output by default and must not overwrite production data automatically.
+8. V0.7.0 begins with offline article-context vocabulary generation; real-time AI lookup remains out of scope.
+9. Any future real-time AI lookup must use a backend proxy or Serverless Function with secret storage, rate limiting, CORS controls, and error handling.
+10. Every generated vocabulary package must pass schema review, `node --check`, lookup verification, and saved-word regression checks before commit.

@@ -601,3 +601,29 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
   - 后续如需实时 AI 点词，必须通过后端代理或 Serverless Function。
 - 本轮只修改 docs 和 prompts，不修改业务代码，也不调用 MiniMax API。
 
+## V0.7.0-b MiniMax Context Vocabulary Generator
+
+- V0.7.0-b 已完成本地 MiniMax 语境词汇生成流程。
+- 新增 `tools/generate-context-vocabulary.mjs`，默认使用 `MiniMax-M3`，通过 `MINIMAX_BASE_URL` / `MINIMAX_API_URL` 和环境变量中的 API Key 调用 MiniMax OpenAI-compatible API。
+- 新增 `tools/run-minimax-vocabulary.ps1`，支持隐藏输入 API Key、联通测试和草稿生成；Key 只保留在当前进程中，并在脚本结束后清理。
+- MiniMax 中国站 Base URL 已确认为 `https://api.minimaxi.com/v1`。
+- `.gitignore` 已忽略本地密钥文件和 `generated/` 草稿目录。
+- 已完成首个真实生成试点：`How Public Libraries Are Changing in the Digital Age`。
+- `MiniMax-M3` 初始生成 36 条草稿；人工审核、纠错和补充后形成 40 条正式文章语境词汇。
+- 新增正式词汇包 articleId：`how-public-libraries-are-changing-in-the-digital-age`。
+- 人工验收通过：
+  - article context phrase 命中正常；
+  - article context word 命中正常；
+  - 普通词回退 local dictionary 正常；
+  - 点词弹窗和生词本兼容。
+- 相关提交：
+  - `eb66328 Add local MiniMax vocabulary generator`
+  - `3c5df97 Support MiniMax base URL configuration`
+  - `2182ce0 Add secure MiniMax test wrapper`
+  - `870554b Fix MiniMax test endpoint`
+  - `f9cef7e Use MiniMax China API endpoint`
+  - `7287a41 Add reviewed public libraries context vocabulary`
+- API Key 未进入前端、仓库、文档、Prompt、`localStorage` 或 Git 历史。
+- 本阶段未接入实时 AI 点词；线上产品继续使用人工审核后的静态词汇包。
+- 下一步建议：合并并推送 V0.7.0 分支；之后可按同一流程为其他文章生成和人工审核语境词汇包。
+

@@ -14,11 +14,48 @@ $ErrorActionPreference = 'Stop'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $generatorPath = Join-Path $PSScriptRoot 'generate-context-vocabulary.mjs'
+$localEnvPath = Join-Path $projectRoot '.env.local'
 $keyPointer = [IntPtr]::Zero
 $plainKey = $null
+$secureKey = $null
 $previousKey = $env:MINIMAX_API_KEY
 $previousBaseUrl = $env:MINIMAX_BASE_URL
 $previousModel = $env:MINIMAX_MODEL
+
+function Read-LocalEnvConfig {
+    param([string]$Path)
+
+    $config = @{}
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return $config
+    }
+
+    foreach ($line in Get-Content -LiteralPath $Path) {
+        $trimmedLine = $line.Trim()
+        if (-not $trimmedLine -or $trimmedLine.StartsWith('#')) {
+            continue
+        }
+
+        $parts = $trimmedLine.Split('=', 2)
+        if ($parts.Count -ne 2) {
+            continue
+        }
+
+        $name = $parts[0].Trim()
+        $value = $parts[1].Trim()
+        if ($value.Length -ge 2) {
+            $hasDoubleQuotes = $value.StartsWith('"') -and $value.EndsWith('"')
+            $hasSingleQuotes = $value.StartsWith("'") -and $value.EndsWith("'")
+            if ($hasDoubleQuotes -or $hasSingleQuotes) {
+                $value = $value.Substring(1, $value.Length - 2)
+            }
+        }
+
+        $config[$name] = $value
+    }
+
+    return $config
+}
 
 function Restore-ProcessEnvironmentVariable {
     param(
@@ -36,12 +73,42 @@ function Restore-ProcessEnvironmentVariable {
 }
 
 try {
-    $secureKey = Read-Host 'Paste a newly created MiniMax API key' -AsSecureString
-    $keyPointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureKey)
-    $plainKey = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($keyPointer)
+    $localConfig = Read-LocalEnvConfig -Path $localEnvPath
+
+    if (-not $PSBoundParameters.ContainsKey('BaseUrl')) {
+        if (-not [string]::IsNullOrWhiteSpace($localConfig['MINIMAX_BASE_URL'])) {
+            $BaseUrl = $localConfig['MINIMAX_BASE_URL']
+        }
+        elseif (-not [string]::IsNullOrWhiteSpace($previousBaseUrl)) {
+            $BaseUrl = $previousBaseUrl
+        }
+    }
+
+    if (-not $PSBoundParameters.ContainsKey('Model')) {
+        if (-not [string]::IsNullOrWhiteSpace($localConfig['MINIMAX_MODEL'])) {
+            $Model = $localConfig['MINIMAX_MODEL']
+        }
+        elseif (-not [string]::IsNullOrWhiteSpace($previousModel)) {
+            $Model = $previousModel
+        }
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($localConfig['MINIMAX_API_KEY'])) {
+        $plainKey = $localConfig['MINIMAX_API_KEY']
+        Write-Host 'Using MiniMax API key from .env.local.'
+    }
+    elseif (-not [string]::IsNullOrWhiteSpace($previousKey)) {
+        $plainKey = $previousKey
+        Write-Host 'Using MiniMax API key from the current process environment.'
+    }
+    else {
+        $secureKey = Read-Host 'Paste a newly created MiniMax API key' -AsSecureString
+        $keyPointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureKey)
+        $plainKey = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($keyPointer)
+    }
 
     if ([string]::IsNullOrWhiteSpace($plainKey)) {
-        throw 'The MiniMax API key cannot be empty.'
+        throw 'The MiniMax API key cannot be empty. Add it to .env.local or enter it when prompted.'
     }
 
     if (($plainKey -match '\s') -or ($plainKey -match 'SetEnvironmentVariable')) {

@@ -627,3 +627,30 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 - 本阶段未接入实时 AI 点词；线上产品继续使用人工审核后的静态词汇包。
 - 下一步建议：合并并推送 V0.7.0 分支；之后可按同一流程为其他文章生成和人工审核语境词汇包。
 
+## V0.7.1 Persistent MiniMax Configuration and Heat Vocabulary
+
+- V0.7.1 已完成 MiniMax 本地持久化配置。
+- 新增 `.env.example`，用于说明本地 MiniMax 配置格式，不包含真实 API Key。
+- 本机使用 `.env.local` 保存 API Key、Base URL 和模型配置；该文件已被 Git 忽略，不会进入仓库。
+- `tools/run-minimax-vocabulary.ps1` 现在按以下顺序读取 Key：
+  - `.env.local`；
+  - 当前进程环境变量；
+  - 隐藏输入提示。
+- MiniMax 连接测试通过：`MiniMax-M3` at `https://api.minimaxi.com/v1/chat/completions`。
+- 已使用持久化配置为 `How Cities Adapt to Extreme Heat` 生成语境词汇草稿。
+- 初次生成因重复 `urban heat island` 被质量校验拒绝；重试后生成 31 条草稿。
+- 人工审核时完成以下修正：
+  - `canopy` 改为正文原词 `canopies`；
+  - 不在正文中的 `resilience` 改为核心原词 `adaptation`；
+  - 移除例句中没有来源支撑的具体温差表述。
+- 新增正式词汇包 articleId：`how-cities-adapt-to-extreme-heat`，共 31 条：
+  - 13 个短语；
+  - 18 个单词。
+- 校验通过：无重复、无缺失字段、所有 term 均能在文章正文中命中，例句未复制正文。
+- 人工页面验收通过。
+- 相关提交：
+  - `de3eb81 Support persistent local MiniMax configuration`
+  - `fee91e7 Add reviewed heat adaptation context vocabulary`
+- API Key 未进入前端、Git、文档、Prompt、`localStorage` 或正式词汇数据。
+- 线上产品仍使用人工审核后的静态词汇包，不在浏览器端直接调用 MiniMax API。
+

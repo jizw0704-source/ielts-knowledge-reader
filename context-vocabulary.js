@@ -926,4 +926,223 @@ window.ARTICLE_CONTEXT_VOCABULARY = {
       example: 'Trust grows when people receive patient and accurate help with difficult information.',
     },
   ],
+  'how-cities-adapt-to-extreme-heat': [
+    {
+      "term": "urban heat island",
+      "type": "phrase",
+      "definitionZh": "城市热岛效应；本文指密集的混凝土、玻璃和柏油区域因吸热多、散热慢，比周边乡村夜间更热的现象。",
+      "definitionEn": "The effect by which dense built-up areas stay significantly warmer than surrounding rural land, especially at night.",
+      "example": "Urban heat islands can keep city centres warmer than nearby countryside after sunset."
+    },
+    {
+      "term": "heat wave",
+      "type": "phrase",
+      "definitionZh": "热浪；本文指持续多日的高温天气，会让街道在夜间仍保持高温，加重健康与能源压力。",
+      "definitionEn": "A prolonged period of unusually high temperatures that can strain health services and energy systems.",
+      "example": "During a heat wave, hospitals often admit more patients with heat-related illnesses."
+    },
+    {
+      "term": "absorb",
+      "type": "word",
+      "definitionZh": "吸收；本文指深色建筑材料吸收大量阳光并储存为热能，使城市表面升温。",
+      "definitionEn": "To take in and store energy, especially sunlight, which in the article raises surface temperatures.",
+      "example": "Dark roofing absorbs more solar radiation than light-coloured surfaces, warming the building beneath."
+    },
+    {
+      "term": "reflective",
+      "type": "word",
+      "definitionZh": "反射性的；本文指通过浅色或特殊涂层把更多太阳能反射回大气，从而降低表面温度。",
+      "definitionEn": "Designed to bounce solar radiation away from a surface, reducing heat absorption.",
+      "example": "Reflective paint on a roof can lower indoor temperatures during summer afternoons."
+    },
+    {
+      "term": "cool roof",
+      "type": "phrase",
+      "definitionZh": "冷屋顶；本文指用反射性材料或浅色涂层覆盖屋顶的建筑改造措施，以减少热量吸收。",
+      "definitionEn": "A roof covered with reflective or light-coloured materials that reduce heat absorption from sunlight.",
+      "example": "Installing a cool roof is one of the simplest ways to cut air-conditioning use in hot climates."
+    },
+    {
+      "term": "pavement",
+      "type": "word",
+      "definitionZh": "路面；本文指街道铺装材料，浅色或反射性路面有助于降低夜间温度。",
+      "definitionEn": "The hard surface of a road or street, whose colour and material affect local temperatures.",
+      "example": "Lighter pavement can stay noticeably cooler than traditional black asphalt on a sunny day."
+    },
+    {
+      "term": "air conditioning",
+      "type": "phrase",
+      "definitionZh": "空调；本文指建筑降温所依赖的电力密集型设备，使用越多，电网压力越大。",
+      "definitionEn": "A mechanical system that cools indoor air, often requiring large amounts of electricity during heat waves.",
+      "example": "Heavy reliance on air conditioning can push a city's electricity grid close to its limit in summer."
+    },
+    {
+      "term": "electricity demand",
+      "type": "phrase",
+      "definitionZh": "电力需求；本文指热浪期间因降温设备集中使用而上升的电网负荷。",
+      "definitionEn": "The amount of electrical power required by users, which can surge when many people run cooling devices.",
+      "example": "Electricity demand usually peaks on the hottest summer afternoons because of widespread cooling use."
+    },
+    {
+      "term": "blue-green infrastructure",
+      "type": "phrase",
+      "definitionZh": "蓝绿基础设施；本文指结合植被、水道、池塘和雨水花园的城市降温与雨水管理网络。",
+      "definitionEn": "Urban systems that combine plants, water features, and permeable spaces to cool cities and manage water.",
+      "example": "Blue-green infrastructure can lower local temperatures while also reducing flood risk after heavy rain."
+    },
+    {
+      "term": "canopies",
+      "type": "word",
+      "definitionZh": "遮阳篷；本文指公交站或步行路线上方用于阻挡阳光直射的覆盖结构。",
+      "definitionEn": "Overhead covers that provide shade for people waiting or walking in hot conditions.",
+      "example": "Canopies at bus stops can make waiting safer during the hottest part of the day."
+    },
+    {
+      "term": "shade",
+      "type": "word",
+      "definitionZh": "阴影；本文指由树木或建筑结构形成的遮蔽区域，是行人降温的关键设计元素。",
+      "definitionEn": "An area protected from direct sunlight, often provided by trees or built structures.",
+      "example": "Wide shade trees can lower surface temperatures enough to make a sidewalk comfortable to walk on."
+    },
+    {
+      "term": "evaporation",
+      "type": "word",
+      "definitionZh": "蒸发；本文指植物和水面通过水分蒸发带走热量，从而降低周围空气温度的过程。",
+      "definitionEn": "The process by which liquid turns into vapour, drawing heat away from surfaces and the surrounding air.",
+      "example": "Evaporation from a pond can noticeably cool the air around it on a hot afternoon."
+    },
+    {
+      "term": "irrigation",
+      "type": "word",
+      "definitionZh": "灌溉；本文指向新栽树木供水的行为，是确保树木存活和发挥降温作用的前提。",
+      "definitionEn": "The supply of water to plants, especially newly planted trees that need care to survive hot summers.",
+      "example": "Without irrigation during the first summers, young street trees often fail to establish."
+    },
+    {
+      "term": "pedestrian",
+      "type": "word",
+      "definitionZh": "行人；本文指在城市街道上步行的人，文章强调街道设计应保障其在高温下的安全。",
+      "definitionEn": "A person travelling on foot, whose comfort and safety depend on street design choices.",
+      "example": "Wide, shaded sidewalks protect pedestrians from the worst of the summer heat."
+    },
+    {
+      "term": "commuter",
+      "type": "word",
+      "definitionZh": "通勤者；本文指出门上下班或上学的人，在高温下需要在公交站等遮蔽良好的场所。",
+      "definitionEn": "A person who travels regularly between home and work or school.",
+      "example": "Commuters benefit from bus shelters that block direct sun during the hottest hours."
+    },
+    {
+      "term": "idle",
+      "type": "word",
+      "definitionZh": "空转；本文指车辆发动机在停车状态下运行，会增加局部热负荷和空气污染。",
+      "definitionEn": "To run an engine while the vehicle is stationary, which adds heat and pollution to the surroundings.",
+      "example": "Limiting how long delivery vans can idle helps reduce both noise and local warming."
+    },
+    {
+      "term": "exhaust",
+      "type": "word",
+      "definitionZh": "尾气；本文指车辆排出的热气与废气，会进一步提升街道局部温度。",
+      "definitionEn": "Waste gases and hot air released by vehicles, which can warm the streets they pass through.",
+      "example": "Heavy traffic exhaust contributes to the uncomfortable warmth of busy urban canyons."
+    },
+    {
+      "term": "insulation",
+      "type": "word",
+      "definitionZh": "隔热材料；本文指墙体或屋顶阻挡热传导的能力，薄弱的隔热会让室内更快升温。",
+      "definitionEn": "Material in walls and roofs that slows the transfer of heat into or out of a building.",
+      "example": "Older buildings with poor insulation become dangerously hot during long heat waves."
+    },
+    {
+      "term": "vulnerable",
+      "type": "word",
+      "definitionZh": "弱势的；本文指更容易因高温而出现健康或生活问题的群体，如老年人、户外劳动者。",
+      "definitionEn": "More easily harmed by a particular risk, such as heat, because of age, health, income, or working conditions.",
+      "example": "Outdoor workers are particularly vulnerable during extreme heat because they cannot avoid the sun."
+    },
+    {
+      "term": "fairness",
+      "type": "word",
+      "definitionZh": "公平；本文指在资金和资源有限时，城市应如何在不同人群与区域之间分配适应措施的伦理问题。",
+      "definitionEn": "The principle of distributing benefits and burdens equitably across different groups and neighbourhoods.",
+      "example": "Deciding which districts receive cooling centres first is fundamentally a question of fairness."
+    },
+    {
+      "term": "sensor",
+      "type": "word",
+      "definitionZh": "传感器；本文指装在屋顶、灯柱和交通走廊上监测温度变化的设备，为预警提供数据。",
+      "definitionEn": "A device that measures conditions such as temperature and sends the readings to a monitoring system.",
+      "example": "Sensors on lamp posts can map how temperatures vary from street to street within a city."
+    },
+    {
+      "term": "weather forecast",
+      "type": "phrase",
+      "definitionZh": "天气预报；本文中作为数据来源之一，与健康数据结合后用于提前发出高温预警。",
+      "definitionEn": "Predictions about upcoming atmospheric conditions, used here to trigger heat warnings.",
+      "example": "Combining weather forecasts with health data helps officials issue warnings several days in advance."
+    },
+    {
+      "term": "heat alert",
+      "type": "phrase",
+      "definitionZh": "高温警报；本文指官方在极端高温来临前向公众发布的提醒，常配合调整服务与开放避暑中心。",
+      "definitionEn": "An official warning issued before dangerous heat arrives, often linked to extra public services.",
+      "example": "When a heat alert is issued, some cities extend public transport hours for older residents."
+    },
+    {
+      "term": "cooling centre",
+      "type": "phrase",
+      "definitionZh": "避暑中心；本文指高温期间为无法在家降温的居民开放的公共凉爽场所。",
+      "definitionEn": "A public indoor space opened during heat waves to provide relief for people without home cooling.",
+      "example": "Libraries and community halls often serve as cooling centres during severe heat waves."
+    },
+    {
+      "term": "public education",
+      "type": "phrase",
+      "definitionZh": "公共教育；本文指通过社区与本地网络让居民理解高温风险并采取防护措施的宣传行动。",
+      "definitionEn": "Efforts to inform the general public about risks and protective actions through trusted channels.",
+      "example": "Public education campaigns teach residents how to recognise heat illness and where to seek help."
+    },
+    {
+      "term": "trusted local network",
+      "type": "phrase",
+      "definitionZh": "本地可信赖的信息网络；本文指能让高温警报真正到达居民的社区与邻里沟通渠道。",
+      "definitionEn": "Community-based channels through which warnings and advice reliably reach local residents.",
+      "example": "Warnings spread through a trusted local network are far more likely to change daily behaviour."
+    },
+    {
+      "term": "governance",
+      "type": "word",
+      "definitionZh": "治理；本文指城市规划、资金分配与跨部门协调等长期管理高温适应的制度安排。",
+      "definitionEn": "The way cities plan, fund, and coordinate long-term responses to challenges such as extreme heat.",
+      "example": "Effective heat adaptation depends on strong governance as much as on new technologies."
+    },
+    {
+      "term": "maintenance budget",
+      "type": "phrase",
+      "definitionZh": "维护预算；本文指为绿地、屋顶和遮阳设施等长期运转所必需的资金安排。",
+      "definitionEn": "Money set aside to keep infrastructure such as trees, roofs, and shelters in working condition over time.",
+      "example": "Without a maintenance budget, newly planted trees quickly lose their cooling benefits."
+    },
+    {
+      "term": "adaptation",
+      "type": "word",
+      "definitionZh": "适应；本文指城市通过设计、治理、预警和维护等长期措施，降低极端高温带来的健康与生活风险。",
+      "definitionEn": "Long-term changes in urban design, services, and governance that reduce the risks created by extreme heat.",
+      "example": "Heat adaptation works best when physical design and public services are planned together."
+    },
+    {
+      "term": "unpredictable",
+      "type": "word",
+      "definitionZh": "不可预测的；本文指未来热浪在持续时间、强度和出现时间上可能比以往更难准确预判。",
+      "definitionEn": "Difficult to forecast in timing, duration, or intensity, requiring flexible adaptation plans.",
+      "example": "Because future heat waves may be unpredictable, cities need flexible rather than fixed responses."
+    },
+    {
+      "term": "seasonal inconvenience",
+      "type": "phrase",
+      "definitionZh": "季节性小麻烦；本文用以批评将高温仅视为短暂不适的观点，强调应将其当作长期城市问题对待。",
+      "definitionEn": "A minor, short-lived problem associated with a particular season, contrasted here with a permanent urban issue.",
+      "example": "Treating extreme heat as a seasonal inconvenience leaves cities unprepared for longer future summers."
+    }
+  ],
 };

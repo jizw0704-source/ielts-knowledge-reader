@@ -118,7 +118,39 @@ function formatEstimatedReadingTime(minutes) {
 }
 
 const PRODUCT_DESCRIPTION = '每天一篇原创 IELTS-style 英文知识阅读，支持点词释义、生词本、阅读记录和读后感。';
-const QUOTE_SPLASH_QUOTE = 'Learning begins when attention becomes quiet.';
+const QUOTE_SPLASH_QUOTES = [
+  'Learning begins when attention becomes quiet.',
+  'A careful reader turns unfamiliar words into familiar ideas.',
+  'Curiosity grows stronger each time you follow a difficult sentence.',
+  'Knowledge becomes useful when you connect it to what you already know.',
+  'One focused page can change the direction of a whole day.',
+  'Reading slowly is often the fastest way to understand deeply.',
+  'New vocabulary stays longer when it arrives inside a meaningful story.',
+  'Every difficult paragraph is a map waiting to be unfolded.',
+  'Attention is the bridge between seeing words and gaining knowledge.',
+  'A question carried through a text often finds more than one answer.',
+  'Progress in reading is built from small moments of clear understanding.',
+  'The mind remembers ideas better when curiosity gives them a place.',
+  'Strong readers do not avoid confusion; they investigate it.',
+  'A new word becomes yours when you meet it in a living context.',
+  'Reading across subjects teaches language and the world at the same time.',
+  'Patient attention can turn complexity into structure.',
+  'Understanding grows when you pause long enough to notice relationships.',
+  'Each article is a conversation between evidence and interpretation.',
+  'The habit of reading gives curiosity somewhere to go every day.',
+  'Difficult ideas become manageable when you examine them one sentence at a time.',
+  'Knowledge expands when one fact leads you toward another question.',
+  'Reading is practice in noticing what hurried eyes would miss.',
+  'A focused mind can find patterns inside unfamiliar language.',
+  'The best vocabulary lessons are hidden inside ideas worth remembering.',
+  'Every return to the page strengthens the path to understanding.',
+  'Clear thinking begins with careful observation.',
+  'A short daily reading habit can build a wide intellectual world.',
+  'When language becomes clearer, complex ideas become more approachable.',
+  'Read for meaning first, then let the words reveal how meaning is built.',
+  'Curiosity makes difficult texts feel less like walls and more like doors.',
+  "Today's paragraph can become tomorrow's way of seeing.",
+];
 const QUOTE_SPLASH_DELAY_MS = 10000;
 
 function toLocalDateKey(date = new Date()) {
@@ -130,6 +162,11 @@ function toLocalDateKey(date = new Date()) {
 
 function getTodayDateString() {
   return toLocalDateKey();
+}
+
+function getDailyQuote(date = new Date()) {
+  const dayIndex = Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
+  return QUOTE_SPLASH_QUOTES[dayIndex % QUOTE_SPLASH_QUOTES.length];
 }
 
 function isArticlePublished(article, today = getTodayDateString()) {
@@ -632,6 +669,7 @@ function hideQuoteSplashAndShowToday() {
 
 function showQuoteSplash() {
   hideQuoteSplash();
+  const dailyQuote = getDailyQuote();
 
   const splash = document.createElement('section');
   splash.className = 'quote-splash';
@@ -640,7 +678,7 @@ function showQuoteSplash() {
   splash.innerHTML = `
     <div class="hero-card quote-splash-panel">
       <p class="section-kicker">IELTS Knowledge Reader</p>
-      <h1 class="quote-splash-quote">${escapeHtml(QUOTE_SPLASH_QUOTE)}</h1>
+      <h1 class="quote-splash-quote">${escapeHtml(dailyQuote)}</h1>
       <p class="card-note">${escapeHtml(PRODUCT_DESCRIPTION)}</p>
       <p class="card-note">约 10 秒后自动进入今日推荐，也可以直接 Skip。</p>
       <div class="cta-row quote-splash-actions">

@@ -94,7 +94,7 @@ window.ARTICLE_CONTEXT_VOCABULARY = {
     {
       term: 'attention',
       type: 'word',
-      definitionZh: '注意力；把 ذهن focused 在一件事上的能力。',
+      definitionZh: '注意力；把思维集中在一件事上并忽略干扰的能力。',
       definitionEn: 'The ability to focus on one thing and ignore distractions.',
       example: 'Attention is easier to keep in a quiet room.',
     },

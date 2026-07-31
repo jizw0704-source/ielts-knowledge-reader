@@ -275,7 +275,7 @@ window.RAW_ARTICLES = [
     title: 'Why Peatlands Matter for Climate and Water',
     subtitle: 'Waterlogged soils store carbon for centuries, but drainage can turn them into long-lasting sources of emissions and fire risk.',
     sourceType: 'Source-backed Original IELTS-style Article',
-    difficulty: 'IELTS 6.5?7.0',
+    difficulty: 'IELTS 6.5–7.0',
     tags: ['Environment', 'Climate', 'Ecology'],
     summaryZh: '\u6ce5\u70ad\u5730\u901a\u8fc7\u957f\u671f\u79ef\u7d2f\u672a\u5b8c\u5168\u5206\u89e3\u7684\u6709\u673a\u8d28\uff0c\u50a8\u5b58\u5927\u91cf\u571f\u58e4\u78b3\u5e76\u8c03\u8282\u6c34\u6587\u8fc7\u7a0b\u3002\u6587\u7ae0\u8ba8\u8bba\u6392\u6c34\u9020\u6210\u7684\u78b3\u6392\u653e\u3001\u5730\u9762\u6c89\u964d\u548c\u706b\u707e\u98ce\u9669\uff0c\u4ee5\u53ca\u590d\u6e7f\u3001\u957f\u671f\u76d1\u6d4b\u4e0e\u793e\u533a\u751f\u8ba1\u4e4b\u95f4\u7684\u5e73\u8861\u3002',
     summaryEn: 'Peatlands store exceptional amounts of soil carbon because water slows decomposition. The article explains how drainage creates emissions, subsidence, and fire risk, and why restoration must combine rewetting with long-term monitoring and support for local livelihoods.',

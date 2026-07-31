@@ -654,3 +654,14 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 - API Key 未进入前端、Git、文档、Prompt、`localStorage` 或正式词汇数据。
 - 线上产品仍使用人工审核后的静态词汇包，不在浏览器端直接调用 MiniMax API。
 
+## Content Validation Guard
+
+- 新增零依赖内容校验工具 `tools/validate-content.mjs`。
+- 默认运行命令：`node tools/validate-content.mjs`。
+- 校验范围包括文章结构、文章 ID、发布日期、难度格式、750–900 词长度、中文乱码、语境词汇结构、重复词条和来源链接。
+- 字段缺失、重复 ID / 日期、字数越界、难度格式错误、连续问号、Unicode 替换字符、无中文释义和非法来源链接会阻断校验。
+- 历史内容问题默认作为 warning；使用 `--strict` 时 warning 也会导致失败。
+- 当前基线：12 篇文章、7 个语境词汇包、186 条语境词汇、8 条 references，硬错误为 0。
+- 当前已识别的历史 warning：1 条中文释义混入异常字符、38 个语境词未在正文逐字出现、5 篇文章缺少专属语境词包。
+- 已通过内存故障注入验证：难度问号、连续问号、字数越界、重复文章 ID、重复发布日期和非法引用 URL 均会被正确拦截。
+- 本阶段未修改文章、词典数据、UI、localStorage、入口文件或线上运行逻辑。

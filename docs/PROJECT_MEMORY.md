@@ -665,3 +665,17 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 - 当前已识别的历史 warning：1 条中文释义混入异常字符、38 个语境词未在正文逐字出现、5 篇文章缺少专属语境词包。
 - 已通过内存故障注入验证：难度问号、连续问号、字数越界、重复文章 ID、重复发布日期和非法引用 URL 均会被正确拦截。
 - 本阶段未修改文章、词典数据、UI、localStorage、入口文件或线上运行逻辑。
+
+## V0.7.2 Complete Context Vocabulary Coverage
+
+- 12 篇正式文章的文章级语境词汇包已全部补齐。
+- 本阶段新增 3 个经过人工审核的词汇包：
+  - `the-history-of-timekeeping`：20 条；
+  - `why-fungi-matter-to-life-on-earth`：20 条；
+  - `how-sensors-changed-modern-farming`：20 条。
+- 当前内容基线：12 篇文章、12 个语境词汇包、286 条语境词汇、8 条 references。
+- `node tools/validate-content.mjs --verbose` 已通过，语境词汇包缺失 warning 已清零。
+- 所有新增 term 均能在对应文章正文中逐字命中，无同包重复，中文内容保持 UTF-8。
+- 375px 手机端回归通过：三篇文章均能命中文章级语境释义，生词添加、展示和删除正常，原有生词未受影响，控制台无错误。
+- 业务数据提交：`c775301 Complete contextual vocabulary coverage`。
+- 本阶段业务改动只涉及 `context-vocabulary.js`，未修改文章正文、全局词典、UI、点词逻辑或 `localStorage` key。

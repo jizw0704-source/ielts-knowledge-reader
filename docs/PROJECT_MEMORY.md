@@ -679,3 +679,14 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 - 375px 手机端回归通过：三篇文章均能命中文章级语境释义，生词添加、展示和删除正常，原有生词未受影响，控制台无错误。
 - 业务数据提交：`c775301 Complete contextual vocabulary coverage`。
 - 本阶段业务改动只涉及 `context-vocabulary.js`，未修改文章正文、全局词典、UI、点词逻辑或 `localStorage` key。
+
+## V0.8.0 Local Data Backup and Restore
+
+- 生词本页面已新增“备份与恢复”入口，支持导出生词和阅读记录为带版本号的 JSON 文件。
+- 导入流程包含 2MB 文件限制、格式与版本检查、记录数量限制、数据规范化、数量预览、用户确认和取消操作。
+- 确认导入后会用备份替换当前设备上的生词与阅读记录；双存储写入失败时会尝试恢复原值，页面状态不会提前切换。
+- 现有存储键保持不变：`ielts-knowledge-reader.vocab.v1` 与 `ielts_reader_reading_records`。
+- 业务提交：`4ffc6b7 Add local data backup and restore`。
+- 375px 手机端验收通过：真实备份下载、有效文件预览与恢复、错误 JSON 拦截、取消恢复均正常。
+- 完整回归通过：首页、文章库筛选、阅读页、点词、刷新后生词保留、熟悉程度、删除、完成阅读、读后感和复制分享语正常；控制台无错误。
+- 本阶段未修改文章、上下文词汇、基础词典、查词规则、`index.html`、`style.css` 或现有 `localStorage` 键名。

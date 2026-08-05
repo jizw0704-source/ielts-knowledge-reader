@@ -1,5 +1,11 @@
 ﻿const STORAGE_KEY = 'ielts-knowledge-reader.vocab.v1';
 const ALLOWED_FAMILIARITY = ['陌生', '认识', '掌握'];
+const READING_RECORDS_STORAGE_KEY = 'ielts_reader_reading_records';
+const USER_DATA_BACKUP_FORMAT = 'ielts-knowledge-reader-user-data';
+const USER_DATA_BACKUP_VERSION = 1;
+const MAX_BACKUP_FILE_SIZE_BYTES = 2 * 1024 * 1024;
+const MAX_BACKUP_VOCABULARY_ITEMS = 5000;
+const MAX_BACKUP_READING_RECORDS = 1000;
 
 function normalizeWord(value) {
   return String(value || '')
@@ -515,6 +521,7 @@ const state = {
   activeTag: '全部',
   readingRecords: [],
   vocabulary: [],
+  pendingDataBackup: null,
   currentDefinition: null,
   currentWordContext: null,
   timerSeconds: 0,
@@ -588,6 +595,8 @@ function bindEvents() {
 
   dom.todayArticleCard.addEventListener('click', handleViewAction);
   dom.libraryList.addEventListener('click', handleViewAction);
+  dom.vocabStats.addEventListener('click', handleDataBackupAction);
+  dom.vocabStats.addEventListener('change', handleDataBackupFileChange);
   dom.vocabList.addEventListener('click', handleVocabActionV2);
   dom.vocabList.addEventListener('change', handleVocabChangeV2);
   dom.tagFilterBar.addEventListener('click', handleTagFilter);
@@ -878,6 +887,7 @@ function renderVocabView() {
       </div>
     </div>
     <p class="card-note">熟悉程度支持：陌生 / 认识 / 掌握</p>
+    ${renderDataBackupPanel()}
   `;
 
   if (!vocabulary.length) {
@@ -917,6 +927,249 @@ function renderVocabView() {
       </article>
     `)
     .join('');
+}
+
+function renderDataBackupPanel() {
+  const pendingBackup = state.pendingDataBackup;
+  const pendingPreview = pendingBackup
+    ? `
+      <div class="definition-block">
+        <p class="summary-title">等待确认</p>
+        <p class="card-note">
+          已检查 ${escapeHtml(pendingBackup.fileName)}：包含 ${pendingBackup.vocabulary.length} 个生词和 ${pendingBackup.readingRecords.length} 条阅读记录。
+          确认后会替换当前设备上的对应数据。
+        </p>
+        <div class="cta-row">
+          <button class="primary-button" type="button" data-action="confirm-data-import">确认恢复</button>
+          <button class="secondary-button" type="button" data-action="cancel-data-import">取消</button>
+        </div>
+      </div>
+    `
+    : '';
+
+  return `
+    <div class="summary-block">
+      <p class="summary-title">备份与恢复</p>
+      <p class="card-note">
+        导出当前设备上的 ${state.vocabulary.length} 个生词和 ${state.readingRecords.length} 条阅读记录；导入前会先检查文件并显示数量。
+      </p>
+      <div class="cta-row">
+        <button class="secondary-button" type="button" data-action="export-user-data">导出备份</button>
+        <button class="secondary-button" type="button" data-action="choose-data-backup">导入备份</button>
+        <input type="file" accept="application/json,.json" data-action="data-backup-file" hidden />
+      </div>
+      ${pendingPreview}
+    </div>
+  `;
+}
+
+function buildUserDataBackup() {
+  return {
+    format: USER_DATA_BACKUP_FORMAT,
+    version: USER_DATA_BACKUP_VERSION,
+    exportedAt: new Date().toISOString(),
+    vocabulary: state.vocabulary,
+    readingRecords: state.readingRecords,
+  };
+}
+
+function exportUserData() {
+  try {
+    const backup = buildUserDataBackup();
+    const content = JSON.stringify(backup, null, 2);
+    const blob = new Blob([content], { type: 'application/json;charset=utf-8' });
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `ielts-knowledge-reader-backup-${toLocalDateKey(new Date())}.json`;
+    link.rel = 'noopener';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 0);
+    showToast(`已导出 ${backup.vocabulary.length} 个生词和 ${backup.readingRecords.length} 条阅读记录`);
+  } catch (error) {
+    console.warn('Failed to export user data:', error);
+    showToast('导出失败，请稍后重试');
+  }
+}
+
+function normalizeImportedVocabulary(items) {
+  const normalizedItems = items.map((item) => normalizeVocabItem(item));
+  if (normalizedItems.some((item) => !item)) {
+    throw new Error('备份中包含无效的生词记录');
+  }
+
+  return normalizedItems.reduce((accumulator, item) => {
+    const existingIndex = accumulator.findIndex((entry) => entry.word === item.word);
+    if (existingIndex >= 0) {
+      accumulator[existingIndex] = item;
+    } else {
+      accumulator.push(item);
+    }
+    return accumulator;
+  }, []);
+}
+
+function normalizeImportedReadingRecords(items) {
+  const normalizedItems = items.map((item) => normalizeReadingRecord(item));
+  if (normalizedItems.some((item) => !item)) {
+    throw new Error('备份中包含无效的阅读记录');
+  }
+
+  return normalizedItems.reduce((accumulator, item) => {
+    const existingIndex = accumulator.findIndex((entry) => entry.articleId === item.articleId);
+    if (existingIndex >= 0) {
+      accumulator[existingIndex] = item;
+    } else {
+      accumulator.push(item);
+    }
+    return accumulator;
+  }, []);
+}
+
+function parseUserDataBackup(payload, fileName) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    throw new Error('这不是有效的备份文件');
+  }
+
+  if (payload.format !== USER_DATA_BACKUP_FORMAT || payload.version !== USER_DATA_BACKUP_VERSION) {
+    throw new Error('备份格式或版本不受支持');
+  }
+
+  if (typeof payload.exportedAt !== 'string' || Number.isNaN(Date.parse(payload.exportedAt))) {
+    throw new Error('备份缺少有效的导出时间');
+  }
+
+  if (!Array.isArray(payload.vocabulary) || !Array.isArray(payload.readingRecords)) {
+    throw new Error('备份缺少生词或阅读记录');
+  }
+
+  if (payload.vocabulary.length > MAX_BACKUP_VOCABULARY_ITEMS
+    || payload.readingRecords.length > MAX_BACKUP_READING_RECORDS) {
+    throw new Error('备份中的记录数量过多');
+  }
+
+  return {
+    fileName: String(fileName || '备份文件'),
+    exportedAt: payload.exportedAt,
+    vocabulary: normalizeImportedVocabulary(payload.vocabulary),
+    readingRecords: normalizeImportedReadingRecords(payload.readingRecords),
+  };
+}
+
+async function readUserDataBackupFile(file) {
+  if (!file || file.size <= 0) {
+    throw new Error('备份文件为空');
+  }
+
+  if (file.size > MAX_BACKUP_FILE_SIZE_BYTES) {
+    throw new Error('备份文件不能超过 2MB');
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(await file.text());
+  } catch {
+    throw new Error('无法读取该 JSON 备份文件');
+  }
+
+  return parseUserDataBackup(payload, file.name);
+}
+
+function restoreStorageValue(key, value) {
+  if (value === null) {
+    localStorage.removeItem(key);
+  } else {
+    localStorage.setItem(key, value);
+  }
+}
+
+function importPendingUserData() {
+  const pendingBackup = state.pendingDataBackup;
+  if (!pendingBackup) {
+    showToast('请先选择备份文件');
+    return;
+  }
+
+  let previousVocabularyRaw;
+  let previousReadingRecordsRaw;
+
+  try {
+    previousVocabularyRaw = localStorage.getItem(STORAGE_KEY);
+    previousReadingRecordsRaw = localStorage.getItem(READING_RECORDS_STORAGE_KEY);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(pendingBackup.vocabulary));
+    localStorage.setItem(READING_RECORDS_STORAGE_KEY, JSON.stringify(pendingBackup.readingRecords));
+  } catch (error) {
+    try {
+      if (previousVocabularyRaw !== undefined) {
+        restoreStorageValue(STORAGE_KEY, previousVocabularyRaw);
+      }
+      if (previousReadingRecordsRaw !== undefined) {
+        restoreStorageValue(READING_RECORDS_STORAGE_KEY, previousReadingRecordsRaw);
+      }
+    } catch (rollbackError) {
+      console.warn('Failed to roll back user data import:', rollbackError);
+    }
+    console.warn('Failed to import user data:', error);
+    showToast('恢复失败，当前页面数据未更改');
+    return;
+  }
+
+  state.vocabulary = pendingBackup.vocabulary;
+  state.readingRecords = pendingBackup.readingRecords;
+  state.pendingDataBackup = null;
+  renderAllViews();
+  showToast(`恢复完成：${state.vocabulary.length} 个生词，${state.readingRecords.length} 条阅读记录`);
+}
+
+function handleDataBackupAction(event) {
+  const button = event.target.closest('[data-action]');
+  if (!button) {
+    return;
+  }
+
+  const { action } = button.dataset;
+  if (action === 'export-user-data') {
+    exportUserData();
+    return;
+  }
+
+  if (action === 'choose-data-backup') {
+    const fileInput = dom.vocabStats.querySelector('[data-action="data-backup-file"]');
+    fileInput?.click();
+    return;
+  }
+
+  if (action === 'confirm-data-import') {
+    importPendingUserData();
+    return;
+  }
+
+  if (action === 'cancel-data-import') {
+    state.pendingDataBackup = null;
+    renderVocabView();
+    showToast('已取消恢复');
+  }
+}
+
+async function handleDataBackupFileChange(event) {
+  const fileInput = event.target.closest('[data-action="data-backup-file"]');
+  if (!fileInput || !fileInput.files?.length) {
+    return;
+  }
+
+  try {
+    state.pendingDataBackup = await readUserDataBackupFile(fileInput.files[0]);
+    renderVocabView();
+    showToast('备份检查通过，请确认恢复');
+  } catch (error) {
+    state.pendingDataBackup = null;
+    renderVocabView();
+    showToast(error instanceof Error ? error.message : '备份文件检查失败');
+  } finally {
+    fileInput.value = '';
+  }
 }
 
 function renderReaderView() {
@@ -1018,7 +1271,7 @@ function getReadingRecord(articleId) {
 
 function loadReadingRecords() {
   try {
-    const raw = localStorage.getItem('ielts_reader_reading_records');
+    const raw = localStorage.getItem(READING_RECORDS_STORAGE_KEY);
     if (!raw) {
       return [];
     }
@@ -1081,7 +1334,7 @@ function normalizeReadingRecord(item) {
 
 function persistReadingRecords() {
   try {
-    localStorage.setItem('ielts_reader_reading_records', JSON.stringify(state.readingRecords));
+    localStorage.setItem(READING_RECORDS_STORAGE_KEY, JSON.stringify(state.readingRecords));
   } catch (error) {
     console.warn('Failed to persist reading records:', error);
     showToast('阅读记录暂时无法保存');

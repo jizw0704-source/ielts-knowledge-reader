@@ -519,6 +519,7 @@ const state = {
   returnView: 'today',
   activeArticleId: null,
   activeTag: '全部',
+  isMobileGuideOpen: false,
   readingRecords: [],
   vocabulary: [],
   pendingDataBackup: null,
@@ -792,6 +793,39 @@ function renderTodayView() {
       <button class="primary-button" type="button" data-action="open-article" data-article-id="${escapeAttr(article.id)}">开始阅读</button>
       <span class="card-note">发布日期：${formatDate(article.publishDate)}</span>
     </div>
+    <div class="cta-row">
+      <button
+        class="secondary-button"
+        type="button"
+        data-action="toggle-mobile-guide"
+        aria-expanded="${state.isMobileGuideOpen}"
+        aria-controls="mobileInstallGuide"
+      >${state.isMobileGuideOpen ? '收起手机说明' : '手机使用说明'}</button>
+      <span class="card-note">添加到主屏幕，像轻量 App 一样快速打开</span>
+    </div>
+    ${renderMobileInstallGuide()}
+  `;
+}
+
+function renderMobileInstallGuide() {
+  return `
+    <section
+      id="mobileInstallGuide"
+      class="summary-block${state.isMobileGuideOpen ? '' : ' is-hidden'}"
+      aria-label="手机使用说明"
+    >
+      <p class="summary-title">添加到手机主屏幕</p>
+      <p class="card-note">添加后仍需联网使用；生词和阅读记录只保存在当前浏览器。</p>
+      <div class="definition-block">
+        <p><strong>iPhone / iPad（Safari）</strong></p>
+        <p>用 Safari 打开本页，点“分享”，选择“添加到主屏幕”，开启“作为网页 App 打开”，再点“添加”。</p>
+      </div>
+      <div class="definition-block">
+        <p><strong>Android（Chrome）</strong></p>
+        <p>点地址栏右侧“更多”，选择“添加到主屏幕” → “创建快捷方式”，再点“添加”。</p>
+      </div>
+      <p class="card-note">请勿使用无痕模式或清理网站数据。需要换设备时，请先到生词本使用“备份与恢复”。</p>
+    </section>
   `;
 }
 
@@ -1478,6 +1512,12 @@ function handleViewAction(event) {
 
   if (action === 'skip-quote-splash') {
     hideQuoteSplashAndShowToday();
+    return;
+  }
+
+  if (action === 'toggle-mobile-guide') {
+    state.isMobileGuideOpen = !state.isMobileGuideOpen;
+    renderTodayView();
     return;
   }
 

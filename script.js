@@ -531,10 +531,13 @@ const state = {
   quoteSplashTimerId: null,
 };
 
+let deferredInstallPrompt = null;
 const dom = {};
 
 document.addEventListener('DOMContentLoaded', init);
 window.addEventListener('load', registerServiceWorker);
+window.addEventListener('beforeinstallprompt', handleInstallPromptAvailable);
+window.addEventListener('appinstalled', handleAppInstalled);
 window.addEventListener('beforeunload', () => {
   stopReadingTimer();
   clearQuoteSplashTimer();
@@ -548,6 +551,54 @@ function registerServiceWorker() {
   navigator.serviceWorker.register('./sw.js').catch((error) => {
     console.warn('Service worker registration failed:', error);
   });
+}
+
+function handleInstallPromptAvailable(event) {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+
+  if (dom.todayArticleCard) {
+    renderTodayView();
+  }
+}
+
+function handleAppInstalled() {
+  deferredInstallPrompt = null;
+
+  if (dom.todayArticleCard) {
+    renderTodayView();
+  }
+
+  if (dom.toast) {
+    showToast('安装完成，可以从主屏幕直接打开');
+  }
+}
+
+function isAppRunningStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true;
+}
+
+async function promptAppInstall() {
+  if (!deferredInstallPrompt) {
+    state.isMobileGuideOpen = true;
+    renderTodayView();
+    showToast('请按手机使用说明手动添加到主屏幕');
+    return;
+  }
+
+  const installPrompt = deferredInstallPrompt;
+
+  try {
+    const { outcome } = await installPrompt.prompt();
+    showToast(outcome === 'accepted' ? '已确认安装请求' : '已取消安装');
+  } catch (error) {
+    console.warn('App install prompt failed:', error);
+    showToast('暂时无法打开安装提示，请按手机使用说明操作');
+  } finally {
+    deferredInstallPrompt = null;
+    renderTodayView();
+  }
 }
 
 function init() {
@@ -804,6 +855,7 @@ function renderTodayView() {
       <button class="primary-button" type="button" data-action="open-article" data-article-id="${escapeAttr(article.id)}">开始阅读</button>
       <span class="card-note">发布日期：${formatDate(article.publishDate)}</span>
     </div>
+    ${renderPwaInstallAction()}
     <div class="cta-row">
       <button
         class="secondary-button"
@@ -818,6 +870,28 @@ function renderTodayView() {
   `;
 }
 
+function renderPwaInstallAction() {
+  if (isAppRunningStandalone()) {
+    return `
+      <div class="cta-row">
+        <span class="meta-chip is-highlight">已从主屏幕启动</span>
+        <span class="card-note">当前正在独立窗口中使用</span>
+      </div>
+    `;
+  }
+
+  if (!deferredInstallPrompt) {
+    return '';
+  }
+
+  return `
+    <div class="cta-row">
+      <button class="secondary-button" type="button" data-action="install-app">安装到设备</button>
+      <span class="card-note">浏览器将显示安装确认窗口</span>
+    </div>
+  `;
+}
+
 function renderMobileInstallGuide() {
   return `
     <section
@@ -827,6 +901,7 @@ function renderMobileInstallGuide() {
     >
       <p class="summary-title">添加到手机主屏幕</p>
       <p class="card-note">首次在线打开后会缓存应用和内置文章，之后可进行基础离线阅读；生词和阅读记录仍只保存在当前浏览器。</p>
+      <p class="card-note">如果页面显示“安装到设备”按钮，可以直接点击并按浏览器提示确认；没有显示时请按下面的手动步骤操作。</p>
       <div class="definition-block">
         <p><strong>iPhone / iPad（Safari）</strong></p>
         <p>用 Safari 打开本页，点“分享”，选择“添加到主屏幕”，开启“作为网页 App 打开”，再点“添加”。</p>
@@ -1523,6 +1598,11 @@ function handleViewAction(event) {
 
   if (action === 'skip-quote-splash') {
     hideQuoteSplashAndShowToday();
+    return;
+  }
+
+  if (action === 'install-app') {
+    promptAppInstall();
     return;
   }
 

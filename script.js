@@ -534,10 +534,21 @@ const state = {
 const dom = {};
 
 document.addEventListener('DOMContentLoaded', init);
+window.addEventListener('load', registerServiceWorker);
 window.addEventListener('beforeunload', () => {
   stopReadingTimer();
   clearQuoteSplashTimer();
 });
+
+function registerServiceWorker() {
+  if (!('serviceWorker' in navigator) || window.location.protocol === 'file:') {
+    return;
+  }
+
+  navigator.serviceWorker.register('./sw.js').catch((error) => {
+    console.warn('Service worker registration failed:', error);
+  });
+}
 
 function init() {
   cacheDom();
@@ -815,7 +826,7 @@ function renderMobileInstallGuide() {
       aria-label="手机使用说明"
     >
       <p class="summary-title">添加到手机主屏幕</p>
-      <p class="card-note">添加后仍需联网使用；生词和阅读记录只保存在当前浏览器。</p>
+      <p class="card-note">首次在线打开后会缓存应用和内置文章，之后可进行基础离线阅读；生词和阅读记录仍只保存在当前浏览器。</p>
       <div class="definition-block">
         <p><strong>iPhone / iPad（Safari）</strong></p>
         <p>用 Safari 打开本页，点“分享”，选择“添加到主屏幕”，开启“作为网页 App 打开”，再点“添加”。</p>
@@ -824,7 +835,7 @@ function renderMobileInstallGuide() {
         <p><strong>Android（Chrome）</strong></p>
         <p>点地址栏右侧“更多”，选择“添加到主屏幕” → “创建快捷方式”，再点“添加”。</p>
       </div>
-      <p class="card-note">请勿使用无痕模式或清理网站数据。需要换设备时，请先到生词本使用“备份与恢复”。</p>
+      <p class="card-note">离线时无法获取新版本。请勿使用无痕模式或清理网站数据；需要换设备时，请先到生词本使用“备份与恢复”。</p>
     </section>
   `;
 }

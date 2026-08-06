@@ -702,3 +702,20 @@ IELTS Knowledge Reader 是一个面向雅思阅读能力提升的英文知识阅
 - 375px 手机端验收通过：说明入口、展开与收起状态、iOS / Android 文案和排版正常。
 - 完整回归通过：今日推荐、文章库筛选与打开、阅读页、点词释义、生词加入、刷新保留、熟悉程度、删除、完成阅读、读后感和复制分享语正常；控制台无错误。
 - 测试期间临时加入的单词已删除，验收结束时原有 2 个生词和 1 条阅读记录保持不变。
+
+## V0.9.0 Installable Offline PWA Foundation
+
+- 项目已从普通手机端 H5 增强为基础 PWA，仍保持纯静态 GitHub Pages 架构，不引入后端、账号或新的业务存储。
+- 新增 `manifest.webmanifest`，包含应用名称、相对 `start_url` / `scope`、standalone 显示模式、主题色以及 192px / 512px PNG 图标。
+- 新增 180px Apple Touch Icon，并保留可维护的 `icons/app-icon.svg` 图标源文件。
+- 新增 `sw.js`，首次在线访问时缓存完整应用壳、12 篇内置文章、词典数据、Manifest 和图标。
+- Service Worker 采用“在线优先、离线回退”策略：联网时获取并更新缓存，断网时使用已缓存内容；导航失败时回退到缓存的 `index.html`。
+- 缓存清理只处理 `ielts-knowledge-reader-` 前缀，避免影响同一 GitHub Pages 域名下的其他项目。
+- `script.js` 已增加安全的 Service Worker 注册；直接以 `file://` 打开时会跳过注册，原有页面功能不受影响。
+- 手机使用说明已更新：首次在线加载后支持基础离线阅读；离线时不能获取新版本；生词和阅读记录仍只保存在当前浏览器。
+- 业务提交：`edcf8a3 Add installable offline PWA foundation`。
+- 静态校验通过：Manifest JSON、5 个 JavaScript 文件语法、12 篇文章、12 个语境词汇包和 286 条语境词汇均正常。
+- 375px 手机端验收通过：Manifest 与 Apple Touch Icon 正确挂载，PWA 说明排版正常，控制台无错误。
+- 真实离线验收通过：关闭本地静态服务后刷新页面，今日推荐、内置文章、点词释义和文章库标签筛选仍可使用。
+- 完整在线回归通过：生词加入、刷新保留、熟悉程度、删除、完成阅读、读后感和复制分享语正常；测试结束时原有 2 个生词和 1 条阅读记录保持不变。
+- 当前环境无法直接验证 iOS / Android 操作系统最终安装界面；正式部署后需在真实 Safari 和 Chrome 上各完成一次“添加到主屏幕”验收。

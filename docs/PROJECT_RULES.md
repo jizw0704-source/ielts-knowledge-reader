@@ -154,7 +154,7 @@ IELTS Knowledge Reader 是面向雅思阅读能力提升的英文知识阅读器
 1. 数据拆分任务必须分阶段进行。
 2. 不允许一次性同时拆 `RAW_ARTICLES`、`ARTICLE_CONTEXT_VOCABULARY` 和 `references`。
 3. 每次拆分必须保留单独 commit 作为回滚点。
-4. 拆分前后必须测试今日推荐、文章库、阅读页、点词、生词本、完成阅读、读后感、Quote Splash、复制分享语。
+4. 拆分前后必须测试今日推荐、文章库、阅读页、点词、生词本、完成阅读、读后感、每日分享海报、海报下载与复制分享语。
 5. 新增文章时不得伪造 `references`。
 6. 涉及中文内容时必须做 UTF-8 检查。
 7. 工作区不干净时必须停止。
@@ -199,3 +199,19 @@ IELTS Knowledge Reader 是面向雅思阅读能力提升的英文知识阅读器
 8. V0.7.0 begins with offline article-context vocabulary generation; real-time AI lookup remains out of scope.
 9. Any future real-time AI lookup must use a backend proxy or Serverless Function with secret storage, rate limiting, CORS controls, and error handling.
 10. Every generated vocabulary package must pass schema review, `node --check`, lookup verification, and saved-word regression checks before commit.
+
+## V0.9.2 Daily Share Poster and Mobile Preview Rules
+
+1. 用户每天第一次打开应用时，应展示当天的分享海报；同一天已经展示后，普通刷新不再强制重复出现。
+2. 今日文章页必须保留“今日海报”入口，用户可以随时重新打开当天海报。
+3. 每日海报至少包含英文内容、中文理解、内容类型或出处、日期、意境背景图、`IELTS Knowledge Reader` 项目名、项目网址和可扫描的项目二维码。
+4. 第一版海报内容只使用项目原创句子、传统俗语或已经核实出处且版权安全的公共领域名言；不得使用无法核实归属的网络名言，不得伪造作者或出处。
+5. 背景图片必须是项目内置的本地静态素材，不得从客户端调用 AI、图片 API 或第三方随机图片服务。
+6. 用户可以下载 1080 × 1440 PNG 海报；浏览器支持文件分享时可以调用系统分享，不支持时必须回退到下载图片。
+7. 每日海报只允许新增一个独立的已展示日期 `localStorage` 键；该键不属于生词或阅读数据，不进入用户备份文件。
+8. 关闭海报或进入今日阅读后，页面必须回到真正的顶部，顶部品牌栏和当前页面标题保持可见。
+9. 375px 手机宽度下，海报操作、文章标题、难度和来源信息不得相互挤压，不得出现逐字符断行或横向溢出；必要时应改为上下排列。
+10. 桌面端继续保持手机端阅读器的有限内容宽度，不在本阶段扩展为桌面信息门户。
+11. 本阶段不得修改文章、词典、查词规则、生词与阅读记录 `localStorage` 键、备份格式、底部导航结构或 PWA 安装判断。
+12. 图片、样式或脚本变更后必须更新 PWA 缓存版本，并验证在线更新、海报生成与基础离线回退。
+13. 验收至少覆盖 375px、390px 和桌面宽度下的每日首次打开、同日刷新、重新打开海报、下载 PNG、系统分享回退、今日页、文章库、阅读页、导航切换和控制台状态。

@@ -124,7 +124,7 @@ function formatEstimatedReadingTime(minutes) {
 }
 
 const PRODUCT_DESCRIPTION = '每天一篇原创 IELTS-style 英文知识阅读，支持点词释义、生词本、阅读记录和读后感。';
-const QUOTE_SPLASH_QUOTES = [
+const DAILY_READING_QUOTES = [
   'Learning begins when attention becomes quiet.',
   'A careful reader turns unfamiliar words into familiar ideas.',
   'Curiosity grows stronger each time you follow a difficult sentence.',
@@ -157,7 +157,29 @@ const QUOTE_SPLASH_QUOTES = [
   'Curiosity makes difficult texts feel less like walls and more like doors.',
   "Today's paragraph can become tomorrow's way of seeing.",
 ];
-const QUOTE_SPLASH_DELAY_MS = 10000;
+
+const DAILY_POSTER_SEEN_STORAGE_KEY = 'ielts_reader_daily_poster_seen';
+const DAILY_POSTER_PUBLIC_URL = 'https://jizw0704-source.github.io/ielts-knowledge-reader/';
+const DAILY_POSTER_BACKGROUNDS = [
+  './assets/daily-posters/dawn-valley.jpg',
+  './assets/daily-posters/forest-light.jpg',
+  './assets/daily-posters/moonlit-ocean.jpg',
+  './assets/daily-posters/library-window.jpg',
+];
+const DAILY_POSTER_LINES = [
+  { textEn: 'Learning begins when attention becomes quiet.', textZh: '当注意力安静下来，学习便开始了。', type: '原创阅读提示', source: 'IELTS Knowledge Reader 原创' },
+  { textEn: 'A careful reader turns unfamiliar words into familiar ideas.', textZh: '细心的读者，会把陌生的词变成熟悉的想法。', type: '原创阅读提示', source: 'IELTS Knowledge Reader 原创' },
+  { textEn: 'Curiosity grows stronger each time you follow a difficult sentence.', textZh: '每一次读懂难句，好奇心都会更有力量。', type: '原创阅读提示', source: 'IELTS Knowledge Reader 原创' },
+  { textEn: 'Knowledge becomes useful when you connect it to what you already know.', textZh: '知识与已有经验相连时，才真正开始发挥作用。', type: '原创阅读提示', source: 'IELTS Knowledge Reader 原创' },
+  { textEn: 'One focused page can change the direction of a whole day.', textZh: '专注读完一页，就可能改变一天的方向。', type: '原创阅读提示', source: 'IELTS Knowledge Reader 原创' },
+  { textEn: 'Reading slowly is often the fastest way to understand deeply.', textZh: '慢慢阅读，常常是深入理解最快的方式。', type: '原创阅读提示', source: 'IELTS Knowledge Reader 原创' },
+  { textEn: 'New vocabulary stays longer when it arrives inside a meaningful story.', textZh: '新词进入有意义的故事里，记忆会停留得更久。', type: '原创阅读提示', source: 'IELTS Knowledge Reader 原创' },
+  { textEn: 'Every difficult paragraph is a map waiting to be unfolded.', textZh: '每一段难文，都是一张等待展开的地图。', type: '原创阅读提示', source: 'IELTS Knowledge Reader 原创' },
+  { textEn: 'A journey of a thousand miles begins with a single step.', textZh: '千里之行，始于足下。', type: '英语俗语', source: 'Traditional proverb' },
+  { textEn: 'Where there is a will, there is a way.', textZh: '有志者，事竟成。', type: '英语俗语', source: 'Traditional proverb' },
+  { textEn: 'The early bird catches the worm.', textZh: '早起的鸟儿有虫吃。', type: '英语俗语', source: 'Traditional proverb' },
+  { textEn: 'A picture is worth a thousand words.', textZh: '一图胜千言。', type: '英语俗语', source: 'Traditional proverb' },
+];
 
 function toLocalDateKey(date = new Date()) {
   const year = date.getFullYear();
@@ -172,7 +194,34 @@ function getTodayDateString() {
 
 function getDailyQuote(date = new Date()) {
   const dayIndex = Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
-  return QUOTE_SPLASH_QUOTES[dayIndex % QUOTE_SPLASH_QUOTES.length];
+  return DAILY_READING_QUOTES[dayIndex % DAILY_READING_QUOTES.length];
+}
+
+function getDailyPoster(date = new Date()) {
+  const dayIndex = Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
+  const line = DAILY_POSTER_LINES[dayIndex % DAILY_POSTER_LINES.length];
+  return {
+    ...line,
+    dateKey: toLocalDateKey(date),
+    dateLabel: new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' }).format(date),
+    background: DAILY_POSTER_BACKGROUNDS[dayIndex % DAILY_POSTER_BACKGROUNDS.length],
+  };
+}
+
+function hasSeenDailyPoster(dateKey = getTodayDateString()) {
+  try {
+    return localStorage.getItem(DAILY_POSTER_SEEN_STORAGE_KEY) === dateKey;
+  } catch (error) {
+    return false;
+  }
+}
+
+function markDailyPosterSeen(dateKey = getTodayDateString()) {
+  try {
+    localStorage.setItem(DAILY_POSTER_SEEN_STORAGE_KEY, dateKey);
+  } catch (error) {
+    console.warn('Unable to remember daily poster state:', error);
+  }
 }
 
 function isArticlePublished(article, today = getTodayDateString()) {
@@ -527,8 +576,6 @@ const state = {
   currentWordContext: null,
   timerSeconds: 0,
   timerId: null,
-  quoteSplashEl: null,
-  quoteSplashTimerId: null,
 };
 
 let deferredInstallPrompt = null;
@@ -540,7 +587,6 @@ window.addEventListener('beforeinstallprompt', handleInstallPromptAvailable);
 window.addEventListener('appinstalled', handleAppInstalled);
 window.addEventListener('beforeunload', () => {
   stopReadingTimer();
-  clearQuoteSplashTimer();
 });
 
 function registerServiceWorker() {
@@ -603,12 +649,19 @@ async function promptAppInstall() {
 
 function init() {
   cacheDom();
+  if ('scrollRestoration' in window.history) {
+    window.history.scrollRestoration = 'manual';
+  }
   state.readingRecords = loadReadingRecords();
   state.vocabulary = loadVocabulary();
   bindEvents();
   renderAllViews();
   showView('today');
-  showQuoteSplash();
+  window.setTimeout(() => {
+    if (!hasSeenDailyPoster()) {
+      openDailyPoster({ markSeen: true });
+    }
+  }, 0);
 }
 
 function cacheDom() {
@@ -666,8 +719,13 @@ function bindEvents() {
   dom.readerContent.addEventListener('click', handleReaderClickActionV2);
   dom.definitionModal.addEventListener('click', handleModalClick);
   dom.saveWordButton.addEventListener('click', handleSaveCurrentWordV2);
+  document.addEventListener('click', handleDailyPosterAction);
 
   document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && document.getElementById('dailyPosterOverlay')) {
+      closeDailyPoster();
+      return;
+    }
     if (event.key === 'Escape' && !dom.definitionModal.classList.contains('is-hidden')) {
       closeDefinitionModal();
     }
@@ -705,65 +763,7 @@ function showView(view) {
 
   updateTopbar(view);
   updateDocumentTitle(view);
-
-  if (view === 'today') {
-    dom.todayView.scrollIntoView({ block: 'start' });
-  } else if (view === 'library') {
-    dom.libraryView.scrollIntoView({ block: 'start' });
-  } else if (view === 'vocab') {
-    dom.vocabView.scrollIntoView({ block: 'start' });
-  } else if (view === 'reader') {
-    dom.readerView.scrollIntoView({ block: 'start' });
-  }
-}
-
-function clearQuoteSplashTimer() {
-  if (state.quoteSplashTimerId) {
-    window.clearTimeout(state.quoteSplashTimerId);
-    state.quoteSplashTimerId = null;
-  }
-}
-
-function hideQuoteSplash() {
-  clearQuoteSplashTimer();
-  document.body.classList.remove('has-quote-splash');
-
-  if (state.quoteSplashEl) {
-    state.quoteSplashEl.remove();
-    state.quoteSplashEl = null;
-  }
-}
-
-function hideQuoteSplashAndShowToday() {
-  hideQuoteSplash();
-  showView('today');
-}
-
-function showQuoteSplash() {
-  hideQuoteSplash();
-  const dailyQuote = getDailyQuote();
-
-  const splash = document.createElement('section');
-  splash.className = 'quote-splash';
-  splash.setAttribute('role', 'dialog');
-  splash.setAttribute('aria-modal', 'true');
-  splash.innerHTML = `
-    <div class="hero-card quote-splash-panel">
-      <p class="section-kicker">IELTS Knowledge Reader</p>
-      <h1 class="quote-splash-quote">${escapeHtml(dailyQuote)}</h1>
-      <p class="card-note">${escapeHtml(PRODUCT_DESCRIPTION)}</p>
-      <p class="card-note">约 10 秒后自动进入今日推荐，也可以直接 Skip。</p>
-      <div class="cta-row quote-splash-actions">
-        <button class="primary-button" type="button" data-action="skip-quote-splash">Skip</button>
-      </div>
-    </div>
-  `;
-  splash.addEventListener('click', handleViewAction);
-
-  document.body.appendChild(splash);
-  document.body.classList.add('has-quote-splash');
-  state.quoteSplashEl = splash;
-  state.quoteSplashTimerId = window.setTimeout(hideQuoteSplashAndShowToday, QUOTE_SPLASH_DELAY_MS);
+  window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
 }
 
 function updateTopbar(view) {
@@ -817,8 +817,18 @@ function renderTodayView() {
 
   const readingRecord = getReadingRecord(article.id);
   const completed = Boolean(readingRecord);
+  const dailyPoster = getDailyPoster();
+  const dailyQuote = dailyPoster.textEn;
 
   dom.todayArticleCard.innerHTML = `
+    <aside class="daily-reading-quote" aria-label="今日阅读提示">
+      <p class="section-kicker">今日阅读提示</p>
+      <p class="daily-reading-quote-text">${escapeHtml(dailyQuote)}</p>
+      <div class="daily-reading-quote-actions">
+        <span class="card-note">每日一张可分享的阅读海报</span>
+        <button class="secondary-button" type="button" data-action="open-daily-poster">打开今日海报</button>
+      </div>
+    </aside>
     <div class="hero-header">
       <div>
         <p class="section-kicker">今日推荐</p>
@@ -1583,6 +1593,297 @@ function stopReadingTimer() {
   }
 }
 
+const posterImageCache = new Map();
+let dailyPosterBlob = null;
+let dailyPosterBlobDateKey = null;
+
+function loadPosterImage(source) {
+  if (posterImageCache.has(source)) {
+    return posterImageCache.get(source);
+  }
+
+  const promise = new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error(`海报素材加载失败：${source}`));
+    image.src = source;
+  });
+  posterImageCache.set(source, promise);
+  return promise;
+}
+
+function wrapCanvasText(context, text, maxWidth) {
+  const characters = Array.from(String(text || ''));
+  const lines = [];
+  let currentLine = '';
+
+  characters.forEach((character) => {
+    const candidate = `${currentLine}${character}`;
+    if (currentLine && context.measureText(candidate).width > maxWidth) {
+      lines.push(currentLine.trim());
+      currentLine = character;
+    } else {
+      currentLine = candidate;
+    }
+  });
+
+  if (currentLine.trim()) {
+    lines.push(currentLine.trim());
+  }
+
+  return lines;
+}
+
+function drawCanvasText(context, text, x, y, maxWidth, lineHeight) {
+  const lines = wrapCanvasText(context, text, maxWidth);
+  lines.forEach((line, index) => {
+    context.fillText(line, x, y + index * lineHeight);
+  });
+  return y + lines.length * lineHeight;
+}
+
+async function createDailyPosterBlob(poster) {
+  const [background, qrCode] = await Promise.all([
+    loadPosterImage(poster.background),
+    loadPosterImage('./assets/daily-posters/project-qr.png'),
+  ]);
+  const canvas = document.createElement('canvas');
+  canvas.width = 1080;
+  canvas.height = 1440;
+  const context = canvas.getContext('2d');
+  if (!context) {
+    throw new Error('当前浏览器不支持海报生成');
+  }
+
+  const scale = Math.max(canvas.width / background.naturalWidth, canvas.height / background.naturalHeight);
+  const drawWidth = background.naturalWidth * scale;
+  const drawHeight = background.naturalHeight * scale;
+  context.drawImage(background, (canvas.width - drawWidth) / 2, (canvas.height - drawHeight) / 2, drawWidth, drawHeight);
+
+  const gradient = context.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, 'rgba(9, 17, 24, 0.58)');
+  gradient.addColorStop(0.42, 'rgba(9, 17, 24, 0.16)');
+  gradient.addColorStop(0.72, 'rgba(9, 17, 24, 0.28)');
+  gradient.addColorStop(1, 'rgba(9, 17, 24, 0.80)');
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  context.textAlign = 'left';
+  context.fillStyle = '#d9f38d';
+  context.font = '700 27px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+  context.fillText('IELTS KNOWLEDGE READER', 76, 92);
+  context.fillStyle = 'rgba(255,255,255,0.78)';
+  context.font = '500 25px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+  context.fillText(poster.dateLabel, 76, 132);
+
+  context.fillStyle = '#ffffff';
+  context.font = '700 64px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+  const quoteStart = 440;
+  const quoteEnd = drawCanvasText(context, poster.textEn, 76, quoteStart, 900, 78);
+  context.fillStyle = 'rgba(255,255,255,0.86)';
+  context.font = '500 36px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif';
+  drawCanvasText(context, poster.textZh, 76, quoteEnd + 36, 900, 52);
+
+  context.fillStyle = 'rgba(255,255,255,0.72)';
+  context.font = '500 25px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif';
+  context.fillText(`${poster.type} · ${poster.source}`, 76, 1026);
+
+  context.fillStyle = '#ffffff';
+  context.fillRect(76, 1112, 232, 232);
+  context.drawImage(qrCode, 88, 1124, 208, 208);
+  context.fillStyle = '#ffffff';
+  context.font = '700 30px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+  context.fillText('每天读一篇', 350, 1170);
+  context.font = '500 26px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif';
+  context.fillStyle = 'rgba(255,255,255,0.82)';
+  context.fillText('原创 IELTS-style 英文知识阅读', 350, 1214);
+  context.fillText(DAILY_POSTER_PUBLIC_URL.replace('https://', ''), 350, 1260);
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        reject(new Error('海报生成失败，请稍后再试'));
+      }
+    }, 'image/png');
+  });
+}
+
+function prepareDailyPosterBlob(poster) {
+  if (dailyPosterBlobDateKey === poster.dateKey && dailyPosterBlob) {
+    return Promise.resolve(dailyPosterBlob);
+  }
+
+  dailyPosterBlobDateKey = poster.dateKey;
+  dailyPosterBlob = null;
+  return createDailyPosterBlob(poster)
+    .then((blob) => {
+      if (dailyPosterBlobDateKey === poster.dateKey) {
+        dailyPosterBlob = blob;
+      }
+      return blob;
+    })
+    .catch((error) => {
+      console.warn('Daily poster preparation failed:', error);
+      return null;
+    });
+}
+
+function getDailyPosterFilename(poster) {
+  return `ielts-reader-daily-poster-${poster.dateKey}.png`;
+}
+
+async function downloadDailyPoster() {
+  const poster = getDailyPoster();
+  try {
+    const blob = dailyPosterBlob || await createDailyPosterBlob(poster);
+    if (!blob) {
+      throw new Error('海报生成失败，请稍后再试');
+    }
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = getDailyPosterFilename(poster);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+    showToast('海报已下载到设备');
+  } catch (error) {
+    console.warn('Daily poster download failed:', error);
+    showToast(error instanceof Error ? error.message : '海报下载失败');
+  }
+}
+
+async function shareDailyPoster() {
+  const poster = getDailyPoster();
+  try {
+    const blob = dailyPosterBlob || await createDailyPosterBlob(poster);
+    if (!blob) {
+      throw new Error('海报生成失败，请稍后再试');
+    }
+    const file = new File([blob], getDailyPosterFilename(poster), { type: 'image/png' });
+    const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+      || (navigator.maxTouchPoints > 1 && window.matchMedia('(max-width: 640px)').matches);
+    if (isMobileDevice && navigator.share && navigator.canShare?.({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: '今日阅读海报｜IELTS Knowledge Reader',
+        text: poster.textEn,
+      });
+      showToast('已打开系统分享面板');
+      return;
+    }
+
+    await downloadDailyPoster();
+    showToast('当前浏览器不支持文件分享，已改为下载海报');
+  } catch (error) {
+    if (error?.name === 'AbortError') {
+      return;
+    }
+    if (error?.name === 'NotAllowedError' || /user gesture|handling a user gesture/i.test(String(error?.message || ''))) {
+      await downloadDailyPoster();
+      showToast('当前浏览器未允许直接分享，已改为下载海报');
+      return;
+    }
+    console.warn('Daily poster share failed:', error);
+    showToast(error instanceof Error ? error.message : '分享失败，已保留下载入口');
+  }
+}
+
+function closeDailyPoster() {
+  const overlay = document.getElementById('dailyPosterOverlay');
+  if (overlay) {
+    overlay.remove();
+  }
+  document.body.classList.remove('has-daily-poster');
+}
+
+function openDailyPoster({ markSeen = false } = {}) {
+  const poster = getDailyPoster();
+  if (markSeen) {
+    markDailyPosterSeen(poster.dateKey);
+  }
+  closeDailyPoster();
+  document.body.insertAdjacentHTML('beforeend', `
+    <div id="dailyPosterOverlay" class="daily-poster-overlay" role="dialog" aria-modal="true" aria-labelledby="dailyPosterTitle">
+      <button class="daily-poster-backdrop" type="button" data-action="close-daily-poster" aria-label="关闭今日海报"></button>
+      <section class="daily-poster-sheet">
+        <div class="daily-poster-sheet-head">
+          <div>
+            <p class="modal-kicker">每日分享海报</p>
+            <h2 id="dailyPosterTitle">今天，带走一句话</h2>
+          </div>
+          <button class="icon-button" type="button" data-action="close-daily-poster">关闭</button>
+        </div>
+        <div class="daily-poster-preview" style="background-image: url('${escapeAttr(poster.background)}')">
+          <div class="daily-poster-preview-shade"></div>
+          <div class="daily-poster-preview-content">
+            <p class="daily-poster-brand">IELTS KNOWLEDGE READER</p>
+            <p class="daily-poster-date">${escapeHtml(poster.dateLabel)}</p>
+            <blockquote>${escapeHtml(poster.textEn)}</blockquote>
+            <p class="daily-poster-zh">${escapeHtml(poster.textZh)}</p>
+            <p class="daily-poster-source">${escapeHtml(poster.type)} · ${escapeHtml(poster.source)}</p>
+            <div class="daily-poster-footer">
+              <div>
+                <strong>每天读一篇</strong>
+                <span>原创 IELTS-style 英文知识阅读</span>
+                <span>jizw0704-source.github.io/ielts-knowledge-reader</span>
+              </div>
+              <img src="./assets/daily-posters/project-qr.png" alt="打开 IELTS Knowledge Reader 的二维码" width="86" height="86" />
+            </div>
+          </div>
+        </div>
+        <div class="daily-poster-actions">
+          <button class="primary-button" type="button" data-action="download-daily-poster">下载 PNG 海报</button>
+          <button class="secondary-button" type="button" data-action="share-daily-poster">分享海报</button>
+          <button class="ghost-button" type="button" data-action="enter-daily-reading">进入今日阅读</button>
+        </div>
+        <p class="card-note daily-poster-note">今天首次打开时自动出现；关闭后可在“今日推荐”中再次打开。</p>
+      </section>
+    </div>
+  `);
+  document.body.classList.add('has-daily-poster');
+  prepareDailyPosterBlob(poster);
+}
+
+function handleDailyPosterAction(event) {
+  const overlay = event.target.closest('#dailyPosterOverlay');
+  if (!overlay) {
+    return;
+  }
+
+  const button = event.target.closest('[data-action]');
+  if (!button) {
+    return;
+  }
+
+  const { action } = button.dataset;
+  if (action === 'close-daily-poster') {
+    closeDailyPoster();
+    return;
+  }
+
+  if (action === 'download-daily-poster') {
+    downloadDailyPoster();
+    return;
+  }
+
+  if (action === 'share-daily-poster') {
+    shareDailyPoster();
+    return;
+  }
+
+  if (action === 'enter-daily-reading') {
+    const article = getTodayArticle();
+    closeDailyPoster();
+    if (article) {
+      openArticle(article.id, 'today');
+    }
+  }
+}
+
 function handleViewAction(event) {
   const actionButton = event.target.closest('[data-action]');
   if (!actionButton) {
@@ -1596,13 +1897,13 @@ function handleViewAction(event) {
     return;
   }
 
-  if (action === 'skip-quote-splash') {
-    hideQuoteSplashAndShowToday();
+  if (action === 'install-app') {
+    promptAppInstall();
     return;
   }
 
-  if (action === 'install-app') {
-    promptAppInstall();
+  if (action === 'open-daily-poster') {
+    openDailyPoster();
     return;
   }
 

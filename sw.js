@@ -1,9 +1,9 @@
 const CACHE_PREFIX = 'ielts-knowledge-reader-';
-const CACHE_NAME = `${CACHE_PREFIX}v0.9.0`;
+const CACHE_NAME = `${CACHE_PREFIX}v0.9.2`;
 const APP_SHELL = [
   './',
   './index.html',
-  './style.css?v=20260615-stable-v1',
+  './style.css?v=20260821-v0.9.2',
   './articles.js',
   './context-vocabulary.js',
   './base-dictionary.js',
@@ -12,6 +12,11 @@ const APP_SHELL = [
   './icons/apple-touch-icon.png',
   './icons/icon-192.png',
   './icons/icon-512.png',
+  './assets/daily-posters/dawn-valley.jpg',
+  './assets/daily-posters/forest-light.jpg',
+  './assets/daily-posters/moonlit-ocean.jpg',
+  './assets/daily-posters/library-window.jpg',
+  './assets/daily-posters/project-qr.png',
 ];
 
 self.addEventListener('install', (event) => {

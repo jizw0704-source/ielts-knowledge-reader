@@ -1,5 +1,6 @@
 ﻿const STORAGE_KEY = 'ielts-knowledge-reader.vocab.v1';
 const ALLOWED_FAMILIARITY = ['陌生', '认识', '掌握'];
+const DAILY_REVIEW_LIMIT = 10;
 const READING_RECORDS_STORAGE_KEY = 'ielts_reader_reading_records';
 const USER_DATA_BACKUP_FORMAT = 'ielts-knowledge-reader-user-data';
 const USER_DATA_BACKUP_VERSION = 1;
@@ -607,6 +608,7 @@ const state = {
   isMobileGuideOpen: false,
   readingRecords: [],
   vocabulary: [],
+  reviewSession: null,
   pendingDataBackup: null,
   currentDefinition: null,
   currentWordContext: null,
@@ -1069,7 +1071,10 @@ function renderVocabView() {
     return;
   }
 
-  dom.vocabList.innerHTML = vocabulary
+  const reviewPanel = renderDailyReviewPanel(vocabulary);
+  const vocabularyList = state.reviewSession
+    ? ''
+    : vocabulary
     .map((item) => `
       <article class="vocab-item">
         <div class="card-meta-row">
@@ -1093,6 +1098,201 @@ function renderVocabView() {
       </article>
     `)
     .join('');
+
+  dom.vocabList.innerHTML = `${reviewPanel}${vocabularyList}`;
+}
+
+function getDailyReviewVocabulary(dateKey = getTodayDateString()) {
+  const dayIndex = getDateKeyDayIndex(dateKey) ?? 0;
+  const vocabulary = getSortedVocabulary();
+
+  return ALLOWED_FAMILIARITY
+    .flatMap((familiarity) => {
+      const group = vocabulary.filter((item) => item.familiarity === familiarity);
+      if (!group.length) {
+        return [];
+      }
+
+      const offset = ((dayIndex % group.length) + group.length) % group.length;
+      return [...group.slice(offset), ...group.slice(0, offset)];
+    })
+    .slice(0, DAILY_REVIEW_LIMIT);
+}
+
+function createReviewResultCounts() {
+  return Object.fromEntries(ALLOWED_FAMILIARITY.map((level) => [level, 0]));
+}
+
+function renderDailyReviewPanel(vocabulary) {
+  const session = state.reviewSession;
+  if (!session) {
+    const reviewCount = Math.min(vocabulary.length, DAILY_REVIEW_LIMIT);
+    return `
+      <section class="daily-review-card" aria-labelledby="dailyReviewTitle">
+        <p class="section-kicker">今日复习</p>
+        <h3 id="dailyReviewTitle" class="daily-review-title">先回忆，再看释义</h3>
+        <p class="card-note">今天优先安排陌生和认识的词，每轮最多 ${DAILY_REVIEW_LIMIT} 个；本轮共 ${reviewCount} 个。</p>
+        <div class="cta-row daily-review-actions">
+          <button class="primary-button" type="button" data-action="start-daily-review">开始今日复习</button>
+        </div>
+      </section>
+    `;
+  }
+
+  const total = session.words.length;
+  const completed = Math.min(session.currentIndex, total);
+  const isComplete = completed >= total;
+  const progressLabel = isComplete ? `${total} / ${total}` : `${completed + 1} / ${total}`;
+
+  if (isComplete) {
+    return `
+      <section class="daily-review-card is-complete" aria-labelledby="dailyReviewCompleteTitle">
+        <p class="section-kicker">复习完成</p>
+        <h3 id="dailyReviewCompleteTitle" class="daily-review-title">今天的 ${total} 个词已完成</h3>
+        <p class="card-note">熟悉程度已经保存到当前设备的生词本。</p>
+        <div class="daily-review-summary" aria-label="本轮复习结果">
+          ${ALLOWED_FAMILIARITY.map((level) => `
+            <div class="daily-review-summary-item">
+              <strong>${session.results[level] || 0}</strong>
+              <span>${escapeHtml(level)}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div class="cta-row daily-review-actions">
+          <button class="primary-button" type="button" data-action="restart-daily-review">再复习一次</button>
+          <button class="secondary-button" type="button" data-action="exit-daily-review">返回生词列表</button>
+        </div>
+      </section>
+    `;
+  }
+
+  const currentWord = session.words[session.currentIndex];
+  const item = vocabulary.find((entry) => entry.word === currentWord);
+  if (!item) {
+    return `
+      <section class="daily-review-card">
+        <p class="section-kicker">今日复习</p>
+        <h3 class="daily-review-title">当前词条已发生变化</h3>
+        <p class="card-note">请返回生词列表后重新开始。</p>
+        <div class="cta-row daily-review-actions">
+          <button class="secondary-button" type="button" data-action="exit-daily-review">返回生词列表</button>
+        </div>
+      </section>
+    `;
+  }
+
+  return `
+    <section class="daily-review-card" aria-labelledby="dailyReviewWord">
+      <div class="daily-review-progress-row" aria-live="polite">
+        <span>今日复习</span>
+        <strong>${progressLabel}</strong>
+      </div>
+      <progress class="daily-review-progress" max="${total}" value="${completed}">${progressLabel}</progress>
+      <div class="daily-review-prompt">
+        <p id="dailyReviewWord" class="daily-review-word">${escapeHtml(item.word)}</p>
+        <span class="meta-chip">当前：${escapeHtml(item.familiarity)}</span>
+      </div>
+      <div class="daily-review-context">
+        <p class="vocab-meta"><strong>来源文章：</strong>${escapeHtml(item.sourceArticleTitle)}</p>
+        <p class="vocab-meta"><strong>原文句子：</strong>${escapeHtml(item.sourceSentence)}</p>
+      </div>
+      ${session.isRevealed ? `
+        <div class="daily-review-answer">
+          <p class="vocab-meaning"><strong>中文：</strong>${escapeHtml(item.meaningZh)}</p>
+          <p class="vocab-meaning"><strong>English:</strong> ${escapeHtml(item.meaningEn)}</p>
+          <p class="vocab-meta"><strong>例句：</strong>${escapeHtml(item.example)}</p>
+        </div>
+        <fieldset class="daily-review-rating">
+          <legend>现在你对这个词的感觉是？</legend>
+          <div class="daily-review-rating-buttons">
+            ${ALLOWED_FAMILIARITY.map((level) => `
+              <button class="secondary-button" type="button" data-action="rate-review-word" data-word="${escapeAttr(item.word)}" data-familiarity="${escapeAttr(level)}">${escapeHtml(level)}</button>
+            `).join('')}
+          </div>
+        </fieldset>
+      ` : `
+        <div class="cta-row daily-review-actions">
+          <button class="primary-button" type="button" data-action="reveal-review-answer">查看释义</button>
+          <button class="ghost-button" type="button" data-action="exit-daily-review">退出复习</button>
+        </div>
+      `}
+      ${session.isRevealed ? `
+        <div class="cta-row daily-review-actions daily-review-exit-row">
+          <button class="ghost-button" type="button" data-action="exit-daily-review">退出复习</button>
+        </div>
+      ` : ''}
+    </section>
+  `;
+}
+
+function startDailyReview() {
+  const reviewItems = getDailyReviewVocabulary();
+  if (!reviewItems.length) {
+    showToast('请先添加生词再开始复习');
+    return;
+  }
+
+  state.reviewSession = {
+    words: reviewItems.map((item) => item.word),
+    currentIndex: 0,
+    isRevealed: false,
+    results: createReviewResultCounts(),
+  };
+  renderVocabView();
+}
+
+function restartDailyReview() {
+  if (!state.reviewSession?.words.length) {
+    startDailyReview();
+    return;
+  }
+
+  state.reviewSession = {
+    words: [...state.reviewSession.words],
+    currentIndex: 0,
+    isRevealed: false,
+    results: createReviewResultCounts(),
+  };
+  renderVocabView();
+}
+
+function exitDailyReview() {
+  state.reviewSession = null;
+  renderVocabView();
+}
+
+function revealDailyReviewAnswer() {
+  if (!state.reviewSession) {
+    return;
+  }
+
+  state.reviewSession.isRevealed = true;
+  renderVocabView();
+}
+
+function rateDailyReviewWord(word, familiarity) {
+  const session = state.reviewSession;
+  const normalizedWord = normalizeWord(word);
+  if (!session?.isRevealed || !ALLOWED_FAMILIARITY.includes(familiarity)) {
+    return;
+  }
+
+  const currentWord = session.words[session.currentIndex];
+  if (normalizedWord !== currentWord) {
+    return;
+  }
+
+  const item = state.vocabulary.find((entry) => entry.word === normalizedWord);
+  if (!item) {
+    return;
+  }
+
+  item.familiarity = familiarity;
+  session.results[familiarity] += 1;
+  session.currentIndex += 1;
+  session.isRevealed = false;
+  persistVocabulary();
+  renderVocabView();
 }
 
 function renderDataBackupPanel() {
@@ -1284,6 +1484,7 @@ function importPendingUserData() {
 
   state.vocabulary = pendingBackup.vocabulary;
   state.readingRecords = pendingBackup.readingRecords;
+  state.reviewSession = null;
   state.pendingDataBackup = null;
   renderAllViews();
   showToast(`恢复完成：${state.vocabulary.length} 个生词，${state.readingRecords.length} 条阅读记录`);
@@ -2247,7 +2448,33 @@ function handleVocabActionV2(event) {
     return;
   }
 
-  const { action, word } = button.dataset;
+  const { action, word, familiarity } = button.dataset;
+
+  if (action === 'start-daily-review') {
+    startDailyReview();
+    return;
+  }
+
+  if (action === 'reveal-review-answer') {
+    revealDailyReviewAnswer();
+    return;
+  }
+
+  if (action === 'rate-review-word') {
+    rateDailyReviewWord(word, familiarity);
+    return;
+  }
+
+  if (action === 'restart-daily-review') {
+    restartDailyReview();
+    return;
+  }
+
+  if (action === 'exit-daily-review') {
+    exitDailyReview();
+    return;
+  }
+
   const normalizedWord = normalizeWord(word);
 
   if (action === 'delete-word') {

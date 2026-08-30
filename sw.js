@@ -1,13 +1,13 @@
 const CACHE_PREFIX = 'ielts-knowledge-reader-';
-const CACHE_NAME = `${CACHE_PREFIX}v1.0-a`;
+const CACHE_NAME = `${CACHE_PREFIX}v1.0-b`;
 const APP_SHELL = [
   './',
   './index.html',
-  './style.css?v=20260821-v0.9.2',
+  './style.css?v=20260830-v1.0-b',
   './articles.js',
   './context-vocabulary.js',
   './base-dictionary.js',
-  './script.js',
+  './script.js?v=20260830-v1.0-b',
   './manifest.webmanifest',
   './icons/apple-touch-icon.png',
   './icons/icon-192.png',

@@ -192,6 +192,42 @@ function getTodayDateString() {
   return toLocalDateKey();
 }
 
+function getDateKeyDayIndex(dateKey) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(dateKey));
+  if (!match) {
+    return null;
+  }
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const timestamp = Date.UTC(year, month - 1, day);
+  const normalized = new Date(timestamp);
+
+  if (
+    normalized.getUTCFullYear() !== year
+    || normalized.getUTCMonth() !== month - 1
+    || normalized.getUTCDate() !== day
+  ) {
+    return null;
+  }
+
+  return Math.floor(timestamp / 86400000);
+}
+
+function getDailyRotationIndex(dateKey, itemCount) {
+  if (!Number.isInteger(itemCount) || itemCount <= 0) {
+    return -1;
+  }
+
+  const dayIndex = getDateKeyDayIndex(dateKey);
+  if (dayIndex === null) {
+    return 0;
+  }
+
+  return ((dayIndex % itemCount) + itemCount) % itemCount;
+}
+
 function getDailyQuote(date = new Date()) {
   const dayIndex = Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
   return DAILY_READING_QUOTES[dayIndex % DAILY_READING_QUOTES.length];
@@ -1376,7 +1412,13 @@ function renderArticleReferences(article) {
 
 function getTodayArticle(today = getTodayDateString()) {
   const publishedArticles = getPublishedArticles(today);
-  return publishedArticles.find((article) => article.publishDate === today) || publishedArticles[0] || null;
+  const scheduledArticle = publishedArticles.find((article) => article.publishDate === today);
+  if (scheduledArticle) {
+    return scheduledArticle;
+  }
+
+  const rotationIndex = getDailyRotationIndex(today, publishedArticles.length);
+  return publishedArticles[rotationIndex] || null;
 }
 
 function getFilteredArticles() {

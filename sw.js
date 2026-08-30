@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'ielts-knowledge-reader-';
-const CACHE_NAME = `${CACHE_PREFIX}v0.9.2`;
+const CACHE_NAME = `${CACHE_PREFIX}v1.0-a`;
 const APP_SHELL = [
   './',
   './index.html',

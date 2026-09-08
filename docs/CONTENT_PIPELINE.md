@@ -2,13 +2,15 @@
 
 ## 1. Purpose
 
-This process upgrades daily articles from ordinary original IELTS-style articles to source-backed original IELTS-style articles. It gives each new article a clear path from reference research to original writing, contextual vocabulary, local verification, and commit.
+This process upgrades daily articles from ordinary original IELTS-style articles to source-backed English knowledge articles that deliver both IELTS reading practice and genuine knowledge growth. It gives each new article a clear path from reference research to original writing, contextual vocabulary, local verification, and commit.
 
-The goal is to keep the product useful for IELTS reading practice while making future content more traceable, more reliable, and easier to maintain.
+The goal is to make every article pass two gates: it must be useful for IELTS reading practice, and it must leave the reader with accurate, memorable knowledge. Future content should also be traceable, reliable, and maintainable.
 
 ## 2. Core Principle
 
 - Articles must be original.
+- Every article must begin with one clear knowledge question and end with 2–4 reviewable knowledge takeaways.
+- Reading difficulty and knowledge value are separate quality gates; passing one does not compensate for failing the other.
 - Multiple sources may be used for topics, factual points, structure, and terminology.
 - Copying, translating, or closely rewriting a single source is forbidden.
 - `references` records reference sources only; it does not mean the article is republished, translated, or adapted from those sources.
@@ -17,16 +19,18 @@ The goal is to keep the product useful for IELTS reading practice while making f
 
 ## 3. New Article Workflow
 
-1. 确定主题；
+1. 确定主题，并写出一个核心知识问题；
 2. 搜集 2–4 个参考来源；
-3. 提炼事实点、结构和关键词；
-4. 写成原创 IELTS-style 文章；
-5. 生成 `summaryZh` / `summaryEn`；
-6. 生成 `coreWords`；
-7. 生成 `ARTICLE_CONTEXT_VOCABULARY`；
-8. 填写 `references`；
-9. 本地验收；
-10. 提交。
+3. 提炼事实点、概念关系、限制条件和 2–4 个预期知识收获；
+4. 设计 IELTS-style 篇章结构和阅读训练点；
+5. 写成原创 IELTS-style 英文知识文章；
+6. 生成聚焦核心知识的 `summaryZh` / `summaryEn`；
+7. 生成 `coreWords`；
+8. 生成 `ARTICLE_CONTEXT_VOCABULARY`；
+9. 填写 `references`；
+10. 分别执行阅读训练价值、知识价值、事实与版权审核；
+11. 本地验收；
+12. 提交。
 
 ## 4. References Field
 
@@ -63,6 +67,10 @@ Legacy original IELTS-style article; references not backfilled.
 
 ## 6. Validation Checklist
 
+- 是否有一个清晰、值得理解的核心知识问题；
+- 用户读后是否能准确复述 2–4 个关键知识点；
+- 是否同时通过阅读训练价值和知识价值两道门槛；
+- 摘要是否直接呈现核心知识，而不是只介绍文章结构；
 - 新文章是否有 2–4 个来源；
 - `references` 是否真实可追溯；
 - 文章是否原创；

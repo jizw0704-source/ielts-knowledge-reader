@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'ielts-knowledge-reader-';
-const CACHE_NAME = `${CACHE_PREFIX}v1.0-c`;
+const CACHE_NAME = `${CACHE_PREFIX}v1.0-d`;
 const APP_SHELL = [
   './',
   './index.html',
@@ -7,7 +7,7 @@ const APP_SHELL = [
   './articles.js',
   './context-vocabulary.js',
   './base-dictionary.js',
-  './script.js?v=20260830-v1.0-b',
+  './script.js?v=20260908-v1.0-d',
   './manifest.webmanifest',
   './assets/brand/logo-horizontal.svg',
   './assets/brand/logo-horizontal-dark.svg',

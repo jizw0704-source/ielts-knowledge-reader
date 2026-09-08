@@ -124,7 +124,7 @@ function formatEstimatedReadingTime(minutes) {
   return `建议阅读 ${Number(minutes) || 0} 分钟`;
 }
 
-const PRODUCT_DESCRIPTION = '每天一篇原创 IELTS-style 英文知识阅读，支持点词释义、生词本、阅读记录和读后感。';
+const PRODUCT_DESCRIPTION = '每天一篇原创 IELTS-style 英文知识文章，在训练阅读能力的同时积累跨学科知识。';
 const DAILY_READING_QUOTES = [
   'Learning begins when attention becomes quiet.',
   'A careful reader turns unfamiliar words into familiar ideas.',
@@ -878,6 +878,7 @@ function renderTodayView() {
       </div>
     </div>
     <p class="hero-subtitle">${escapeHtml(article.subtitle)}</p>
+    <p class="card-note"><strong>Read for IELTS. Learn for life.</strong> 为雅思而读，为认知而学。</p>
     <p class="card-note">${escapeHtml(PRODUCT_DESCRIPTION)}</p>
     <div class="meta-chips">
       <span class="meta-chip">${escapeHtml(formatWordCount(article.wordCount))}</span>
@@ -2523,7 +2524,7 @@ function buildShareMessage(article) {
   return [
     `我今天读了一篇 IELTS-style 英文知识文章：《${article.title}》。`,
     '',
-    `这是一个${PRODUCT_DESCRIPTION}`,
+    `IELTS Knowledge Reader：${PRODUCT_DESCRIPTION}`,
     '',
     '你也可以体验一下：',
     link,

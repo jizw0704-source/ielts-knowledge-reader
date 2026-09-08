@@ -2,7 +2,7 @@
   "id": "./",
   "name": "IELTS Knowledge Reader",
   "short_name": "IELTS Reader",
-  "description": "面向雅思阅读能力提升的原创英文知识阅读器。",
+  "description": "每天一篇原创 IELTS-style 英文知识文章，在提升雅思阅读能力的同时增长跨学科知识。",
   "lang": "zh-CN",
   "start_url": "./",
   "scope": "./",

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-labelledby="title desc">
+  <title id="title">IELTS Knowledge Reader 标志</title>
+  <desc id="desc">一张带有绿色高亮行的阅读页面</desc>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M44 38h82l22 22v94H44z" stroke="#18324A" stroke-width="13"/>
+    <path d="M126 38v24h22" stroke="#95CA00" stroke-width="13"/>
+    <path d="M66 78h42M66 101h60" stroke="#18324A" stroke-width="12"/>
+    <path d="M66 126h76" stroke="#95CA00" stroke-width="13"/>
+  </g>
+</svg>

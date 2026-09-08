@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 240" role="img" aria-labelledby="title desc">
+  <title id="title">IELTS Knowledge Reader 深色背景标志</title>
+  <desc id="desc">适用于深色背景的阅读页面、高亮线与品牌标准字</desc>
+  <g transform="translate(22 26)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 10h106l30 30v134H22z" stroke="#F8FAF2" stroke-width="14"/>
+    <path d="M128 10v32h30" stroke="#A9DE18" stroke-width="14"/>
+    <path d="M48 66h54M48 94h78" stroke="#F8FAF2" stroke-width="12"/>
+    <path d="M48 128h88" stroke="#A9DE18" stroke-width="14"/>
+  </g>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#F8FAF2">
+    <text x="220" y="128" font-size="112" font-weight="800" letter-spacing="-3">IELTS</text>
+    <text x="580" y="94" font-size="48" font-weight="700">Knowledge</text>
+    <text x="580" y="148" font-size="48" font-weight="700">Reader</text>
+  </g>
+  <path d="M222 156h312" stroke="#A9DE18" stroke-width="13" stroke-linecap="round"/>
+</svg>

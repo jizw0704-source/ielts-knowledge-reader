@@ -158,6 +158,16 @@ header.topbar {
   flex: 1 1 auto;
 }
 
+.topbar-logo {
+  width: min(100%, 18rem);
+  height: auto;
+  margin-bottom: 0.45rem;
+}
+
+.back-button:not(.is-hidden) + .topbar-copy .topbar-logo {
+  width: min(100%, 12rem);
+}
+
 .topbar-eyebrow,
 .section-kicker,
 .reader-kicker,
@@ -1134,6 +1144,18 @@ kbd {
 }
 
 @media (max-width: 479px) {
+  .topbar-logo {
+    width: min(100%, 13rem);
+  }
+
+  .back-button:not(.is-hidden) + .topbar-copy .topbar-logo {
+    width: min(100%, 9.5rem);
+  }
+
+  .topbar-meta {
+    font-size: 0.76rem;
+  }
+
   .hero-header,
   .card-list .card-meta-row {
     flex-direction: column;
